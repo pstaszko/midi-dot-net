@@ -23,267 +23,277 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using System.Collections.Generic;
 
 namespace Midi
 {
     /// <summary>
-    /// Utility functions for encoding and decoding short messages.
+    ///     Utility functions for encoding and decoding short messages.
     /// </summary>
-    static class ShortMsg
+    internal static class ShortMsg
     {
         /// <summary>
-        /// Returns true if the given short message describes a Note On message.
+        ///     Returns true if the given short message describes a Note On message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsNoteOn(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int)dwParam1 & 0xf0) == 0x90;
+            return ((int) dwParam1 & 0xf0) == 0x90;
         }
 
         /// <summary>
-        /// Decodes a Note On short message.
+        ///     Decodes a Note On short message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="channel">Filled in with the channel.</param>
         /// <param name="pitch">Filled in with the pitch.</param>
         /// <param name="velocity">Filled in with the velocity, 0.127</param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
         public static void DecodeNoteOn(UIntPtr dwParam1, UIntPtr dwParam2,
-            out Channel channel, out Pitch pitch, out int velocity, out UInt32 timestamp)
+            out Channel channel, out Pitch pitch, out int velocity, out uint timestamp)
         {
             if (!IsNoteOn(dwParam1, dwParam2))
             {
                 throw new ArgumentException("Not a Note On message.");
             }
-            channel = (Channel)((int)dwParam1 & 0x0f);
-            pitch = (Pitch)(((int)dwParam1 & 0xff00) >> 8);
-            velocity = (((int)dwParam1 & 0xff0000) >> 16);
-            timestamp = (UInt32)dwParam2;
+            channel = (Channel) ((int) dwParam1 & 0x0f);
+            pitch = (Pitch) (((int) dwParam1 & 0xff00) >> 8);
+            velocity = ((int) dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint) dwParam2;
         }
 
         /// <summary>
-        /// Encodes a Note On short message.
+        ///     Encodes a Note On short message.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="pitch">The pitch.</param>
         /// <param name="velocity">The velocity 0..127.</param>
         /// <returns>A value that can be passed to midiOutShortMsg.</returns>
         /// <exception cref="ArgumentOutOfRangeException">pitch is not in MIDI range.</exception>
-        public static UInt32 EncodeNoteOn(Channel channel, Pitch pitch, int velocity)
+        public static uint EncodeNoteOn(Channel channel, Pitch pitch, int velocity)
         {
             channel.Validate();
             if (!pitch.IsInMidiRange())
             {
-                throw new ArgumentOutOfRangeException("Pitch out of MIDI range.");
+                throw new ArgumentOutOfRangeException(nameof(pitch));
             }
             if (velocity < 0 || velocity > 127)
             {
-                throw new ArgumentOutOfRangeException("Velocity is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(velocity));
             }
-            return (UInt32)(0x90 | ((int)channel) | ((int)pitch << 8) | (velocity << 16));
+            return (uint) (0x90 | (int) channel | ((int) pitch << 8) | (velocity << 16));
         }
 
 
         /// <summary>
-        /// Returns true if the given short message describes a Note Off message.
+        ///     Returns true if the given short message describes a Note Off message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsNoteOff(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int)dwParam1 & 0xf0) == 0x80;
+            return ((int) dwParam1 & 0xf0) == 0x80;
         }
 
         /// <summary>
-        /// Decodes a Note Off short message.
+        ///     Decodes a Note Off short message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="channel">Filled in with the channel.</param>
         /// <param name="pitch">Filled in with the pitch.</param>
         /// <param name="velocity">Filled in with the velocity, 0.127</param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
         public static void DecodeNoteOff(UIntPtr dwParam1, UIntPtr dwParam2,
-            out Channel channel, out Pitch pitch, out int velocity, out UInt32 timestamp)
+            out Channel channel, out Pitch pitch, out int velocity, out uint timestamp)
         {
             if (!IsNoteOff(dwParam1, dwParam2))
             {
                 throw new ArgumentException("Not a Note Off message.");
             }
-            channel = (Channel)((int)dwParam1 & 0x0f);
-            pitch = (Pitch)(((int)dwParam1 & 0xff00) >> 8);
-            velocity = (((int)dwParam1 & 0xff0000) >> 16);
-            timestamp = (UInt32)dwParam2;
+            channel = (Channel) ((int) dwParam1 & 0x0f);
+            pitch = (Pitch) (((int) dwParam1 & 0xff00) >> 8);
+            velocity = ((int) dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint) dwParam2;
         }
 
         /// <summary>
-        /// Encodes a Note Off short message.
+        ///     Encodes a Note Off short message.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="pitch">The pitch.</param>
         /// <param name="velocity">The velocity 0..127.</param>
         /// <returns>A value that can be passed to midiOutShortMsg.</returns>
-        public static UInt32 EncodeNoteOff(Channel channel, Pitch pitch, int velocity)
+        public static uint EncodeNoteOff(Channel channel, Pitch pitch, int velocity)
         {
             channel.Validate();
             if (!pitch.IsInMidiRange())
             {
-                throw new ArgumentOutOfRangeException("Pitch out of MIDI range.");
+                throw new ArgumentOutOfRangeException(nameof(pitch));
             }
             if (velocity < 0 || velocity > 127)
             {
-                throw new ArgumentOutOfRangeException("Velocity is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(velocity));
             }
-            return (UInt32)(0x80 | ((int)channel) | ((int)pitch << 8) | (velocity << 16));
+            return (uint) (0x80 | (int) channel | ((int) pitch << 8) | (velocity << 16));
         }
 
         /// <summary>
-        /// Returns true if the given short message describes a Control Change message.
+        ///     Returns true if the given short message describes a Control Change message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsControlChange(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int)dwParam1 & 0xf0) == 0xB0;
+            return ((int) dwParam1 & 0xf0) == 0xB0;
         }
 
         /// <summary>
-        /// Decodes a Control Change short message.
+        ///     Decodes a Control Change short message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="channel">Filled in with the channel.</param>
         /// <param name="control">Filled in with the control.</param>
         /// <param name="value">Filled in with the value, 0-127.</param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
         public static void DecodeControlChange(UIntPtr dwParam1, UIntPtr dwParam2,
-            out Channel channel, out Control control, out int value, out UInt32 timestamp)
+            out Channel channel, out Control control, out int value, out uint timestamp)
         {
             if (!IsControlChange(dwParam1, dwParam2))
             {
                 throw new ArgumentException("Not a control message.");
             }
-            channel = (Channel)((int)dwParam1 & 0x0f);
-            control = (Control)(((int)dwParam1 & 0xff00) >> 8);
-            value = (((int)dwParam1 & 0xff0000) >> 16);
-            timestamp = (UInt32)dwParam2;
+            channel = (Channel) ((int) dwParam1 & 0x0f);
+            control = (Control) (((int) dwParam1 & 0xff00) >> 8);
+            value = ((int) dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint) dwParam2;
         }
 
         /// <summary>
-        /// Encodes a Control Change short message.
+        ///     Encodes a Control Change short message.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="control">The control.</param>
         /// <param name="value">The new value 0..127.</param>
         /// <returns>A value that can be passed to midiOutShortMsg.</returns>
-        public static UInt32 EncodeControlChange(Channel channel, Control control, int value)
+        public static uint EncodeControlChange(Channel channel, Control control, int value)
         {
             channel.Validate();
             control.Validate();
             if (value < 0 || value > 127)
             {
-                throw new ArgumentOutOfRangeException("Value is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(value));
             }
-            return (UInt32)(0xB0 | (int)(channel) | ((int)control << 8) | (value << 16));
+            return (uint) (0xB0 | (int) channel | ((int) control << 8) | (value << 16));
         }
 
         /// <summary>
-        /// Returns true if the given short message a Program Change message.
+        ///     Returns true if the given short message a Program Change message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsProgramChange(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int)dwParam1 & 0xf0) == 0xC0;
+            return ((int) dwParam1 & 0xf0) == 0xC0;
         }
 
         /// <summary>
-        /// Decodes a Program Change short message.
+        ///     Decodes a Program Change short message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="channel">Filled in with the channel, 0-15.</param>
         /// <param name="instrument">Filled in with the instrument, 0-127</param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
         public static void DecodeProgramChange(UIntPtr dwParam1, UIntPtr dwParam2,
-            out Channel channel, out Instrument instrument, out UInt32 timestamp)
+            out Channel channel, out Instrument instrument, out uint timestamp)
         {
             if (!IsProgramChange(dwParam1, dwParam2))
             {
                 throw new ArgumentException("Not a program change message.");
             }
-            channel = (Channel)((int)dwParam1 & 0x0f);
-            instrument = (Instrument)(((int)dwParam1 & 0xff00) >> 8);
-            timestamp = (UInt32)dwParam2;
+            channel = (Channel) ((int) dwParam1 & 0x0f);
+            instrument = (Instrument) (((int) dwParam1 & 0xff00) >> 8);
+            timestamp = (uint) dwParam2;
         }
 
         /// <summary>
-        /// Encodes a Program Change short message.
+        ///     Encodes a Program Change short message.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="instrument">The instrument.</param>
         /// <returns>A value that can be passed to midiOutShortMsg.</returns>
-        public static UInt32 EncodeProgramChange(Channel channel, Instrument instrument)
+        public static uint EncodeProgramChange(Channel channel, Instrument instrument)
         {
             channel.Validate();
             instrument.Validate();
-            return (UInt32)(0xC0 | (int)(channel) | ((int)instrument << 8));
+            return (uint) (0xC0 | (int) channel | ((int) instrument << 8));
         }
 
         /// <summary>
-        /// Returns true if the given MidiInProc params describe a Pitch Bend message.
+        ///     Returns true if the given MidiInProc params describe a Pitch Bend message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsPitchBend(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int)dwParam1 & 0xf0) == 0xE0;
+            return ((int) dwParam1 & 0xf0) == 0xE0;
         }
 
         /// <summary>
-        /// Decodes a Pitch Bend message based on MidiInProc params.
+        ///     Decodes a Pitch Bend message based on MidiInProc params.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="channel">Filled in with the channel, 0-15.</param>
-        /// <param name="value">Filled in with the pitch bend value, 0..16383, 8192 is centered.
+        /// <param name="value">
+        ///     Filled in with the pitch bend value, 0..16383, 8192 is centered.
         /// </param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
         public static void DecodePitchBend(UIntPtr dwParam1, UIntPtr dwParam2,
-                               out Channel channel, out int value, out UInt32 timestamp)
+            out Channel channel, out int value, out uint timestamp)
         {
             if (!IsPitchBend(dwParam1, dwParam2))
             {
                 throw new ArgumentException("Not a pitch bend message.");
             }
-            channel = (Channel)((int)dwParam1 & 0x0f);
-            value = ((((int)dwParam1 >> 9) & 0x3f80) | (((int)dwParam1 >> 8) & 0x7f));
-            timestamp = (UInt32)dwParam2;
+            channel = (Channel) ((int) dwParam1 & 0x0f);
+            value = (((int) dwParam1 >> 9) & 0x3f80) | (((int) dwParam1 >> 8) & 0x7f);
+            timestamp = (uint) dwParam2;
         }
 
         /// <summary>
-        /// Encodes a Pitch Bend short message.
+        ///     Encodes a Pitch Bend short message.
         /// </summary>
         /// <param name="channel">The channel.</param>
         /// <param name="value">The pitch bend value, 0..16383, 8192 is centered.</param>
         /// <returns>A value that can be passed to midiOutShortMsg.</returns>
-        public static UInt32 EncodePitchBend(Channel channel, int value)
+        public static uint EncodePitchBend(Channel channel, int value)
         {
             channel.Validate();
             if (value < 0 || value > 16383)
             {
-                throw new ArgumentOutOfRangeException("Value is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(value));
             }
-            return (UInt32)(0xE0 | (int)(channel) | ((value & 0x7f) << 8) |
-                ((value & 0x3f80) << 9));
+            return (uint) (0xE0 | (int) channel | ((value & 0x7f) << 8) |
+                           ((value & 0x3f80) << 9));
         }
     }
 }

@@ -22,46 +22,43 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+using System;
+
 namespace Midi
 {
     /// <summary>
-    /// Common base class for input and output devices.
+    ///     Common base class for input and output devices.
     /// </summary>
     /// This base class exists mainly so that input and output devices can both go into the same
     /// kinds of MidiMessages.
     public class DeviceBase
     {
         /// <summary>
-        /// Protected constructor.
+        ///     Protected constructor.
         /// </summary>
         /// <param name="name">The name of this device.</param>
         protected DeviceBase(string name)
         {
-            this.name = name;
+            Name = name;
         }
 
         /// <summary>
-        /// The name of this device.
+        ///     The name of this device.
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-        }
-        private string name;
+        public string Name { get; }
     }
 
     /// <summary>
-    /// Exception thrown when an operation on a MIDI device cannot be satisfied.
+    ///     Exception thrown when an operation on a MIDI device cannot be satisfied.
     /// </summary>
-    public class DeviceException : System.ApplicationException
+    public class DeviceException : ApplicationException
     {
         /// <summary>
-        /// Constructs exception with a specific error message.
+        ///     Constructs exception with a specific error message.
         /// </summary>
         /// <param name="message"></param>
-        public DeviceException(string message) { }
+        public DeviceException(string message) : base(message)
+        {
+        }
     }
 }

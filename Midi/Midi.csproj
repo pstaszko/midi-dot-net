@@ -74,6 +74,7 @@
     <Compile Include="OutputDevice.cs" />
     <Compile Include="Pitch.cs" />
     <Compile Include="ShortMsg.cs" />
+    <Compile Include="Unmanaged.cs" />
     <Compile Include="Win32API.cs" />
     <Compile Include="Scale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

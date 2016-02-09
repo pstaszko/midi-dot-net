@@ -25,6 +25,7 @@
 using System;
 using Midi;
 using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace MidiUnitTests
 {
@@ -112,7 +113,7 @@ namespace MidiUnitTests
             Assert.AreEqual(new Chord("Cm/Eb"), new Chord(new Note('C'), Chord.Minor, 1));
             Assert.AreEqual(new Chord("C/G"), new Chord(new Note('C'), Chord.Major, 2));
             Assert.AreEqual(new Chord("Cm/G"), new Chord(new Note('C'), Chord.Minor, 2));
-            Assert.Throws(typeof(ArgumentException),
+            Assert.Throws(typeof(ArgumentNullException),
                 () => new Chord((string)null));
             Assert.Throws(typeof(ArgumentException),
                 () => new Chord(""));

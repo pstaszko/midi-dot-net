@@ -1,51 +1,61 @@
 // Copyright (c) 2011, Justin Ryan
 
 using System;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Midi
 {
     /// <summary>
-    /// Utility functions for encoding and decoding short messages.
+    ///     Utility functions for encoding and decoding short messages.
     /// </summary>
-    static class LongMsg
+    internal static class LongMsg
     {
         /// <summary>
-        /// Returns true if the given long message describes a SysEx message.
+        ///     Returns true if the given long message describes a SysEx message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsSysEx(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            IntPtr newPtr = unchecked((IntPtr)(long)(ulong)dwParam1); //http://stackoverflow.com/questions/3762113/how-can-an-uintptr-object-be-converted-to-intptr-in-c
-            Win32API.MIDIHDR header = (Win32API.MIDIHDR)System.Runtime.InteropServices.Marshal.PtrToStructure(newPtr, typeof(Win32API.MIDIHDR));
-            return typeof(Win32API.MIDIHDR) == header.GetType();
+            var newPtr = dwParam1.ToIntPtr();
+
+            try
+            {
+                Marshal.PtrToStructure<Win32API.MIDIHDR>(newPtr);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
-        /// Decodes a SysEx long message.
+        ///     Decodes a SysEx long message.
         /// </summary>
         /// <param name="dwParam1">The dwParam1 arg passed to MidiInProc.</param>
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         /// <param name="data">The SysEx data to send.</param>
-        /// <param name="timestamp">Filled in with the timestamp in microseconds since
-        /// midiInStart().</param>
-        public static void DecodeSysEx(UIntPtr dwParam1, UIntPtr dwParam2, out byte[] data, out UInt32 timestamp)
+        /// <param name="timestamp">
+        ///     Filled in with the timestamp in microseconds since
+        ///     midiInStart().
+        /// </param>
+        public static void DecodeSysEx(UIntPtr dwParam1, UIntPtr dwParam2, out byte[] data, out uint timestamp)
         {
             //if (!IsSysEx(dwParam1, dwParam2))
             //{
             //    throw new ArgumentException("Not a SysEx message.");
             //}
-            IntPtr newPtr = unchecked((IntPtr)(long)(ulong)dwParam1); //http://stackoverflow.com/questions/3762113/how-can-an-uintptr-object-be-converted-to-intptr-in-c
-            Win32API.MIDIHDR header = (Win32API.MIDIHDR)System.Runtime.InteropServices.Marshal.PtrToStructure(newPtr, typeof(Win32API.MIDIHDR));
+            var newPtr = dwParam1.ToIntPtr();
+            var header = (Win32API.MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (Win32API.MIDIHDR));
             data = new byte[header.dwBytesRecorded];
-            for (int i = 0; i < header.dwBytesRecorded; i++)
+            for (var i = 0; i < header.dwBytesRecorded; i++)
             {
                 //Array.Resize<byte>(ref data, data.Length + 1);
                 //data[data.Length - 1] = System.Runtime.InteropServices.Marshal.ReadByte(header.lpData, i);
-                data[i] = System.Runtime.InteropServices.Marshal.ReadByte(header.lpData, i);
+                data[i] = Marshal.ReadByte(header.lpData, i);
             }
-            timestamp = (UInt32)dwParam2;
+            timestamp = (uint) dwParam2;
         }
 
         /*

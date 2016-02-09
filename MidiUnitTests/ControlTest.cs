@@ -24,6 +24,7 @@
 
 using System;
 using Midi;
+using NUnit.Framework;
 
 namespace MidiUnitTests
 {

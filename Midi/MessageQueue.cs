@@ -28,18 +28,39 @@ using System.Collections.Generic;
 namespace Midi
 {
     /// <summary>
-    /// A time-sorted queue of MIDI messages.
+    ///     A time-sorted queue of MIDI messages.
     /// </summary>
     /// Messages can be added in any order, and can be popped off in timestamp order.
-    class MessageQueue
+    internal class MessageQueue
     {
-        /// <summary>
-        /// Constructs an empty message queue.
-        /// </summary>
-        public MessageQueue() { }
+        // Linked list where each node correponds to a specific timestamp, nodes are sorted by timestamp
+        // increasing, and each node contains an ordered list of messages that have been added for that
+        // timestamp.
+        private readonly LinkedList<List<Message>> _messages = new LinkedList<List<Message>>();
 
         /// <summary>
-        /// Adds a message to the queue.
+        ///     True if the queue is empty.
+        /// </summary>
+        public bool IsEmpty => _messages.Count == 0;
+
+        /// <summary>
+        ///     The timestamp of the earliest messsage(s) in the queue.
+        /// </summary>
+        /// Throws an exception if the queue is empty.
+        public float EarliestTimestamp
+        {
+            get
+            {
+                if (IsEmpty)
+                {
+                    throw new InvalidOperationException("queue is empty");
+                }
+                return _messages.First.Value[0].Time;
+            }
+        }
+
+        /// <summary>
+        ///     Adds a message to the queue.
         /// </summary>
         /// <param name="message">The message to add to the queue.</param>
         /// The message must have a valid timestamp (not MidiMessage.Now), but other than that
@@ -51,70 +72,46 @@ namespace Midi
         {
             // If the list is empty or message is later than any message we already have, we can add this
             // as a new timeslice to the end.
-            if (IsEmpty || message.Time > messages.Last.Value[0].Time)
+            if (IsEmpty || message.Time > _messages.Last.Value[0].Time)
             {
-                List<Message> timeslice = new List<Message>();
-                timeslice.Add(message);
-                messages.AddLast(timeslice);
+                var timeslice = new List<Message> {message};
+                _messages.AddLast(timeslice);
                 return;
             }
             // We need to scan through the list to find where this should be inserted.
-            LinkedListNode<List<Message>> node = messages.Last;
-            while (node.Previous != null && node.Value[0].Time > message.Time) {
+            var node = _messages.Last;
+            while (node.Previous != null && node.Value[0].Time > message.Time)
+            {
                 node = node.Previous;
             }
             // At this point, node refers to a LinkedListNode which either has the correct
             // timestamp, or else a new timeslice needs to be added before or after node.
-            if (node.Value[0].Time < message.Time) {
-                List<Message> timeslice = new List<Message>();
-                timeslice.Add(message);
-                messages.AddAfter(node, timeslice);
-            } else if (node.Value[0].Time > message.Time) {
-                List<Message> timeslice = new List<Message>();
-                timeslice.Add(message);
-                messages.AddBefore(node, timeslice);
-            } else {
+            if (node.Value[0].Time < message.Time)
+            {
+                var timeslice = new List<Message> {message};
+                _messages.AddAfter(node, timeslice);
+            }
+            else if (node.Value[0].Time > message.Time)
+            {
+                var timeslice = new List<Message> {message};
+                _messages.AddBefore(node, timeslice);
+            }
+            else
+            {
                 node.Value.Add(message);
             }
         }
 
         /// <summary>
-        /// Discards all messages in the queue.
+        ///     Discards all messages in the queue.
         /// </summary>
         public void Clear()
         {
-            messages.Clear();
+            _messages.Clear();
         }
 
         /// <summary>
-        /// True if the queue is empty.
-        /// </summary>
-        public bool IsEmpty
-        {
-            get
-            {
-                return messages.Count == 0;
-            }
-        }
-
-        /// <summary>
-        /// The timestamp of the earliest messsage(s) in the queue.
-        /// </summary>
-        /// Throws an exception if the queue is empty.
-        public float EarliestTimestamp
-        {
-            get
-            {
-                if (IsEmpty)
-                {
-                    throw new InvalidOperationException("queue is empty");
-                }
-                return messages.First.Value[0].Time;
-            }
-        }
-
-        /// <summary>
-        /// Removes and returns the message(s) in the queue that have the earliest timestamp.
+        ///     Removes and returns the message(s) in the queue that have the earliest timestamp.
         /// </summary>
         public List<Message> PopEarliest()
         {
@@ -122,14 +119,9 @@ namespace Midi
             {
                 throw new InvalidOperationException("queue is empty");
             }
-            List<Message> result = messages.First.Value;
-            messages.RemoveFirst();
+            var result = _messages.First.Value;
+            _messages.RemoveFirst();
             return result;
         }
-
-        // Linked list where each node correponds to a specific timestamp, nodes are sorted by timestamp
-        // increasing, and each node contains an ordered list of messages that have been added for that
-        // timestamp.
-        private LinkedList<List<Message>> messages = new LinkedList<List<Message>>();
     }
 }
