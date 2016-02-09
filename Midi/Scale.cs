@@ -395,8 +395,8 @@ namespace Midi
             }
         }
 
-        // position of that pitch in noteSequence,
-
         // or -1 if it's not in the scale.
+
+        // position of that pitch in noteSequence,
     }
 }

@@ -26,6 +26,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using Midi.Messages;
+using Midi.Win32;
 
 namespace Midi
 {
@@ -50,7 +52,7 @@ namespace Midi
     ///         Note that the above methods send their messages immediately.  If you wish to arrange
     ///         for a message to be sent at a specific future time, you'll need to instantiate some subclass
     ///         of <see cref="Message" /> (eg <see cref="NoteOnMessage" />) and then pass it to
-    ///         <see cref="Clock.Schedule(Midi.Message)">Clock.Schedule</see>.
+    ///         <see cref="Clock.Schedule(Message)">Clock.Schedule</see>.
     ///     </para>
     /// </remarks>
     /// <threadsafety static="true" instance="true" />
@@ -66,8 +68,8 @@ namespace Midi
         // so they don't need to be guarded by a lock.
         private readonly UIntPtr _deviceId;
         // ReSharper disable once NotAccessedField.Local
-        private Win32API.MIDIOUTCAPS _caps;
-        private Win32API.HMIDIOUT _handle;
+        private MidiOutCaps _caps;
+        private HMIDIOUT _handle;
 
         // Access to the Open/Close state is guarded by lock(this).
         private bool _isOpen;
@@ -77,7 +79,7 @@ namespace Midi
         /// </summary>
         /// <param name="deviceId">Position of this device in the list of all devices.</param>
         /// <param name="caps">Win32 Struct with device metadata</param>
-        private OutputDevice(UIntPtr deviceId, Win32API.MIDIOUTCAPS caps)
+        private OutputDevice(UIntPtr deviceId, MidiOutCaps caps)
             : base(caps.szPname)
         {
             _deviceId = deviceId;
@@ -321,8 +323,8 @@ namespace Midi
             {
                 //Win32API.MMRESULT result;
                 IntPtr ptr;
-                var size = (uint) Marshal.SizeOf(typeof (Win32API.MIDIHDR));
-                var header = new Win32API.MIDIHDR {lpData = Marshal.AllocHGlobal(data.Length)};
+                var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
+                var header = new MIDIHDR {lpData = Marshal.AllocHGlobal(data.Length)};
                 for (var i = 0; i < data.Length; i++)
                     Marshal.WriteByte(header.lpData, i, data[i]);
                 header.dwBufferLength = data.Length;
@@ -331,7 +333,7 @@ namespace Midi
 
                 try
                 {
-                    ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (Win32API.MIDIHDR)));
+                    ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (MIDIHDR)));
                 }
                 catch (Exception)
                 {
@@ -392,13 +394,13 @@ namespace Midi
         ///     appropriate error message.
         /// </summary>
         /// <param name="rc"></param>
-        private static void CheckReturnCode(Win32API.MMRESULT rc)
+        private static void CheckReturnCode(MMRESULT rc)
         {
-            if (rc != Win32API.MMRESULT.MMSYSERR_NOERROR)
+            if (rc != MMRESULT.MMSYSERR_NOERROR)
             {
                 var errorMsg = new StringBuilder(128);
                 rc = Win32API.midiOutGetErrorText(rc, errorMsg);
-                if (rc != Win32API.MMRESULT.MMSYSERR_NOERROR)
+                if (rc != MMRESULT.MMSYSERR_NOERROR)
                 {
                     throw new DeviceException("no error details");
                 }
@@ -438,7 +440,7 @@ namespace Midi
             var result = new OutputDevice[outDevs];
             for (uint deviceId = 0; deviceId < outDevs; deviceId++)
             {
-                Win32API.MIDIOUTCAPS caps;
+                MidiOutCaps caps;
                 Win32API.midiOutGetDevCaps((UIntPtr) deviceId, out caps);
                 result[deviceId] = new OutputDevice((UIntPtr) deviceId, caps);
             }

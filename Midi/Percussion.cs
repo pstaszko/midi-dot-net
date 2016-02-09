@@ -23,6 +23,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
+using Midi.Messages;
 
 namespace Midi
 {

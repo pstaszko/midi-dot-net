@@ -27,6 +27,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Text;
+using Midi.Messages;
+using Midi.Win32;
 
 namespace Midi
 {
@@ -114,9 +116,9 @@ namespace Midi
         //Holds a list of pointers to all the buffers created for handling Long Messages.
         private readonly List<IntPtr> _longMsgBuffers = new List<IntPtr>();
         // ReSharper disable once NotAccessedField.Local
-        private Win32API.MIDIINCAPS _caps;
+        private MIDIINCAPS _caps;
         private Clock _clock;
-        private Win32API.HMIDIIN _handle;
+        private HMIDIIN _handle;
         private bool _isClosing;
 
         // Access to the Open/Close state is guarded by lock(this).
@@ -128,7 +130,7 @@ namespace Midi
         /// </summary>
         /// <param name="deviceId">Position of this device in the list of all devices.</param>
         /// <param name="caps">Win32 Struct with device metadata</param>
-        private InputDevice(UIntPtr deviceId, Win32API.MIDIINCAPS caps)
+        private InputDevice(UIntPtr deviceId, MIDIINCAPS caps)
             : base(caps.szPname)
         {
             _deviceId = deviceId;
@@ -232,12 +234,7 @@ namespace Midi
             ControlChange = null;
             ProgramChange = null;
             PitchBend = null;
-
-            #region SysEx
-
             SysEx = null;
-
-            #endregion
         }
 
         /// <summary>
@@ -293,8 +290,6 @@ namespace Midi
             {
                 CheckOpen();
 
-                #region SysEx
-
                 _isClosing = true;
                 if (_longMsgBuffers.Count > 0)
                 {
@@ -309,16 +304,10 @@ namespace Midi
                 //    }
                 //}
 
-                #endregion
-
                 CheckReturnCode(Win32API.midiInClose(_handle));
                 _isOpen = false;
 
-                #region SysEx
-
                 _isClosing = false;
-
-                #endregion
             }
         }
 
@@ -381,14 +370,10 @@ namespace Midi
                 CheckOpen();
                 CheckNotReceiving();
 
-                #region SysEx
-
                 if (handleSysEx)
                 {
                     _longMsgBuffers.Add(CreateLongMsgBuffer());
                 }
-
-                #endregion
 
                 CheckReturnCode(Win32API.midiInStart(_handle));
                 _isReceiving = true;
@@ -438,13 +423,13 @@ namespace Midi
         ///     appropriate error message.
         /// </summary>
         /// <param name="rc"></param>
-        private static void CheckReturnCode(Win32API.MMRESULT rc)
+        private static void CheckReturnCode(MMRESULT rc)
         {
-            if (rc != Win32API.MMRESULT.MMSYSERR_NOERROR)
+            if (rc != MMRESULT.MMSYSERR_NOERROR)
             {
                 var errorMsg = new StringBuilder(128);
                 rc = Win32API.midiInGetErrorText(rc, errorMsg);
-                if (rc != Win32API.MMRESULT.MMSYSERR_NOERROR)
+                if (rc != MMRESULT.MMSYSERR_NOERROR)
                 {
                     throw new DeviceException("no error details");
                 }
@@ -506,7 +491,7 @@ namespace Midi
             var result = new InputDevice[inDevs];
             for (uint deviceId = 0; deviceId < inDevs; deviceId++)
             {
-                Win32API.MIDIINCAPS caps;
+                MIDIINCAPS caps;
                 Win32API.midiInGetDevCaps((UIntPtr) deviceId, out caps);
                 result[deviceId] = new InputDevice((UIntPtr) deviceId, caps);
             }
@@ -516,13 +501,13 @@ namespace Midi
         /// <summary>
         ///     The input callback for midiOutOpen.
         /// </summary>
-        private void InputCallback(Win32API.HMIDIIN hMidiIn, Win32API.MidiInMessage wMsg,
+        private void InputCallback(HMIDIIN hMidiIn, MidiInMessage wMsg,
             UIntPtr dwInstance, UIntPtr dwParam1, UIntPtr dwParam2)
         {
             _isInsideInputHandler = true;
             try
             {
-                if (wMsg == Win32API.MidiInMessage.MIM_DATA)
+                if (wMsg == MidiInMessage.MIM_DATA)
                 {
                     Channel channel;
                     Pitch pitch;
@@ -582,9 +567,7 @@ namespace Midi
                         }
                     }
                 }
-                    #region SysEx
-
-                else if (wMsg == Win32API.MidiInMessage.MIM_LONGDATA)
+                else if (wMsg == MidiInMessage.MIM_LONGDATA)
                 {
                     if (LongMsg.IsSysEx(dwParam1, dwParam2))
                     {
@@ -612,23 +595,23 @@ namespace Midi
                     }
                 }
                 // The rest of these are just for long message testing
-                else if (wMsg == Win32API.MidiInMessage.MIM_MOREDATA)
+                else if (wMsg == MidiInMessage.MIM_MOREDATA)
                 {
                     InvokeSysEx(new SysExMessage(this, new byte[] {0x13}, 13));
                 }
-                else if (wMsg == Win32API.MidiInMessage.MIM_OPEN)
+                else if (wMsg == MidiInMessage.MIM_OPEN)
                 {
                     //SysEx(new SysExMessage(this, new byte[] { 0x01 }, 1));
                 }
-                else if (wMsg == Win32API.MidiInMessage.MIM_CLOSE)
+                else if (wMsg == MidiInMessage.MIM_CLOSE)
                 {
                     //SysEx(new SysExMessage(this, new byte[] { 0x02 }, 2));
                 }
-                else if (wMsg == Win32API.MidiInMessage.MIM_ERROR)
+                else if (wMsg == MidiInMessage.MIM_ERROR)
                 {
                     InvokeSysEx(new SysExMessage(this, new byte[] {0x03}, 3));
                 }
-                else if (wMsg == Win32API.MidiInMessage.MIM_LONGERROR)
+                else if (wMsg == MidiInMessage.MIM_LONGERROR)
                 {
                     InvokeSysEx(new SysExMessage(this, new byte[] {0x04}, 4));
                 }
@@ -636,8 +619,6 @@ namespace Midi
                 {
                     InvokeSysEx(new SysExMessage(this, new byte[] {0x05}, 5));
                 }
-
-                #endregion
             }
             finally
             {
@@ -649,8 +630,8 @@ namespace Midi
         {
             //add a buffer so we can receive SysEx messages
             IntPtr ptr;
-            var size = (uint) Marshal.SizeOf(typeof (Win32API.MIDIHDR));
-            var header = new Win32API.MIDIHDR
+            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
+            var header = new MIDIHDR
             {
                 lpData = Marshal.AllocHGlobal(4096),
                 dwBufferLength = 4096,
@@ -659,7 +640,7 @@ namespace Midi
 
             try
             {
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (Win32API.MIDIHDR)));
+                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (MIDIHDR)));
             }
             catch (Exception)
             {
@@ -688,7 +669,7 @@ namespace Midi
         private void RecycleLongMsgBuffer(UIntPtr ptr)
         {
             var newPtr = ptr.ToIntPtr();
-            var size = (uint) Marshal.SizeOf(typeof (Win32API.MIDIHDR));
+            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
             CheckReturnCode(Win32API.midiInUnprepareHeader(_handle, newPtr, size));
             CheckReturnCode(Win32API.midiInPrepareHeader(_handle, newPtr, size));
             CheckReturnCode(Win32API.midiInAddBuffer(_handle, newPtr, size));
@@ -704,10 +685,10 @@ namespace Midi
         private void DestroyLongMsgBuffer(UIntPtr ptr)
         {
             var newPtr = ptr.ToIntPtr();
-            var size = (uint) Marshal.SizeOf(typeof (Win32API.MIDIHDR));
+            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
             CheckReturnCode(Win32API.midiInUnprepareHeader(_handle, newPtr, size));
 
-            var header = (Win32API.MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (Win32API.MIDIHDR));
+            var header = (MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
             Marshal.FreeHGlobal(header.lpData);
             Marshal.FreeHGlobal(newPtr);
 

@@ -2,6 +2,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using Midi.Win32;
 
 namespace Midi
 {
@@ -21,7 +22,7 @@ namespace Midi
 
             try
             {
-                Marshal.PtrToStructure<Win32API.MIDIHDR>(newPtr);
+                Marshal.PtrToStructure<MIDIHDR>(newPtr);
                 return true;
             }
             catch (Exception)
@@ -47,7 +48,7 @@ namespace Midi
             //    throw new ArgumentException("Not a SysEx message.");
             //}
             var newPtr = dwParam1.ToIntPtr();
-            var header = (Win32API.MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (Win32API.MIDIHDR));
+            var header = (MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
             data = new byte[header.dwBytesRecorded];
             for (var i = 0; i < header.dwBytesRecorded; i++)
             {

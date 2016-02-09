@@ -25,6 +25,7 @@
 using System;
 using Midi;
 using System.Threading;
+using Midi.Messages;
 
 namespace MidiExamples
 {

@@ -23,6 +23,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
+
 // ReSharper disable InconsistentNaming
 
 namespace Midi
