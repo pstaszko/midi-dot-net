@@ -1,9 +1,0 @@
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\MidiExamples.exe
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\MidiExamples.pdb
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\Midi.dll
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\Midi.pdb
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\Midi.xml
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\obj\Debug\MidiExamples.csprojResolveAssemblyReference.cache
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\obj\Debug\MidiExamples.exe
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\obj\Debug\MidiExamples.pdb
-D:\git\LrControl\Libraries\midi-dot-net\MidiExamples\bin\Debug\MidiExamples.exe.config
