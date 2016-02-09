@@ -39,17 +39,17 @@ namespace Midi
     /// a choice of which device(s) to use.</para>
     /// <para>Open an input device with <see cref="Open"/> and close it with <see cref="Close"/>.
     /// While it is open, you may arrange to start receiving messages with
-    /// <see cref="StartReceiving(Midi.Clock,bool)"/> and then stop receiving them with <see cref="StopReceiving"/>.
+    /// <see cref="StartReceiving"/> and then stop receiving them with <see cref="StopReceiving"/>.
     /// An input device can only receive messages when it is both open and started.</para>
     /// <para>Incoming messages are routed to the corresponding events, such as <see cref="NoteOn"/>
     /// and <see cref="ProgramChange"/>.  The event handlers are invoked on a background thread
-    /// which is started in <see cref="StartReceiving(Midi.Clock,bool)"/> and stopped in <see cref="StopReceiving"/>.
+    /// which is started in <see cref="StartReceiving"/> and stopped in <see cref="StopReceiving"/>.
     /// </para>
     /// <para>As each message is received, it is assigned a timestamp in one of two ways.  If
-    /// <see cref="StartReceiving(Midi.Clock,bool)"/> is called with a <see cref="Clock"/>, then each message is
+    /// <see cref="StartReceiving"/> is called with a <see cref="Clock"/>, then each message is
     /// assigned a time by querying the clock's <see cref="Clock.Time"/> property.  If
-    /// <see cref="StartReceiving(Midi.Clock,bool)"/> is called with null, then each message is assigned a time
-    /// based on the number of seconds since <see cref="StartReceiving(Midi.Clock,bool)"/> was called.</para>
+    /// <see cref="StartReceiving"/> is called with null, then each message is assigned a time
+    /// based on the number of seconds since <see cref="StartReceiving"/> was called.</para>
     /// </remarks>
     /// <threadsafety static="true" instance="true"/>
     /// <seealso cref="Clock"/>
@@ -83,10 +83,12 @@ namespace Midi
         /// </summary>
         public delegate void PitchBendHandler(PitchBendMessage msg);
 
+#region SysEx
         /// <summary>
         /// Delegate called when an input device receives a SysEx message.
         /// </summary>
         public delegate void SysExHandler(SysExMessage msg);
+#endregion
 
         #endregion
 
@@ -117,10 +119,12 @@ namespace Midi
         /// </summary>
         public event PitchBendHandler PitchBend;
 
+#region SysEx
         /// <summary>
         /// Event called when an input device receives a SysEx message.
         /// </summary>
         public event SysExHandler SysEx;
+#endregion
 
         /// <summary>
         /// Removes all event handlers from the input events on this device.
@@ -194,7 +198,7 @@ namespace Midi
         /// <exception cref="InvalidOperationException">The device is already open.</exception>
         /// <exception cref="DeviceException">The device cannot be opened.</exception>
         /// <remarks>Note that Open() establishes a connection to the device, but no messages will
-        /// be received until <see cref="StartReceiving(Midi.Clock)"/> is called.</remarks>
+        /// be received until <see cref="StartReceiving"/> is called.</remarks>
         public void Open()
         {
             if (isInsideInputHandler)
@@ -275,18 +279,6 @@ namespace Midi
         }
 
         /// <summary>
-        ///     <see cref="StartReceiving(Clock,bool)"/>
-        /// </summary>
-        /// <param name="clock">If non-null, the clock's <see cref="Clock.Time"/> property will
-        /// be used to assign a timestamp to each incoming message.  If null, timestamps will be in
-        /// seconds since StartReceiving() was called.</param>
-        /// <exception cref="InvalidOperationException">The device is not open or is already
-        /// receiving.
-        /// </exception>
-        /// <exception cref="DeviceException">The device cannot start receiving.</exception>
-        public void StartReceiving(Clock clock) { StartReceiving(clock, false); }
-
-        /// <summary>
         /// Starts this input device receiving messages.
         /// </summary>
         /// <param name="clock">If non-null, the clock's <see cref="Clock.Time"/> property will
@@ -307,6 +299,9 @@ namespace Midi
         /// <para>The background thread which is created by this method is joined (shut down) in
         /// <see cref="StopReceiving"/>.</para>
         /// </remarks>
+#region SysEx
+        public void StartReceiving(Clock clock) { StartReceiving(clock, false); }
+#endregion
         public void StartReceiving(Clock clock, bool handleSysEx)
         {
             if (isInsideInputHandler)
@@ -339,7 +334,7 @@ namespace Midi
         /// <remarks>
         /// <para>This method waits for all in-progress input event handlers to finish, and then
         /// joins (shuts down) the background thread that was created in
-        /// <see cref="StartReceiving(Midi.Clock)"/>.  Thus, when this function returns you can be sure that no
+        /// <see cref="StartReceiving"/>.  Thus, when this function returns you can be sure that no
         /// more event handlers will be invoked.</para>
         /// <para>It is illegal to call this method from an input event handler (ie, from the
         /// background thread), and doing so throws an exception. If an event handler really needs
@@ -597,6 +592,8 @@ namespace Midi
             }
         }
 
+#region SysEx
+
         private IntPtr CreateLongMsgBuffer()
         {
             //add a buffer so we can receive SysEx messages
@@ -668,6 +665,8 @@ namespace Midi
             return true;
         }
 
+#endregion
+
         #endregion
 
         #region Private Fields
@@ -696,9 +695,13 @@ namespace Midi
         [ThreadStatic]
         static bool isInsideInputHandler = false;
 
+#region SysEx
+
         //Holds a list of pointers to all the buffers created for handling Long Messages.
         private System.Collections.Generic.List<IntPtr> LongMsgBuffers = new System.Collections.Generic.List<IntPtr>();
         private bool isClosing = false;
+
+#endregion
 
         #endregion
     }

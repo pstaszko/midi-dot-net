@@ -1,0 +1,6 @@
+D:\git\LrControl\Libraries\midi-dot-net\Midi\bin\Debug\Midi.XML
+D:\git\LrControl\Libraries\midi-dot-net\Midi\bin\Debug\Midi.dll
+D:\git\LrControl\Libraries\midi-dot-net\Midi\bin\Debug\Midi.pdb
+D:\git\LrControl\Libraries\midi-dot-net\Midi\obj\Debug\Midi.csprojResolveAssemblyReference.cache
+D:\git\LrControl\Libraries\midi-dot-net\Midi\obj\Debug\Midi.dll
+D:\git\LrControl\Libraries\midi-dot-net\Midi\obj\Debug\Midi.pdb

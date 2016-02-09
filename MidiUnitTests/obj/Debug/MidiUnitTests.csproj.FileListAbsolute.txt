@@ -1,0 +1,8 @@
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\bin\Debug\MidiUnitTests.exe
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\bin\Debug\MidiUnitTests.pdb
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\bin\Debug\Midi.dll
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\bin\Debug\Midi.pdb
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\bin\Debug\Midi.xml
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\obj\Debug\MidiUnitTests.csprojResolveAssemblyReference.cache
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\obj\Debug\MidiUnitTests.exe
+D:\git\LrControl\Libraries\midi-dot-net\MidiUnitTests\obj\Debug\MidiUnitTests.pdb
