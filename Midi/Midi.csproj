@@ -58,14 +58,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Channel.cs" />
-    <Compile Include="Chord.cs" />
-    <Compile Include="Clock.cs" />
-    <Compile Include="Control.cs" />
-    <Compile Include="DeviceBase.cs" />
-    <Compile Include="Instrument.cs" />
-    <Compile Include="Interval.cs" />
-    <Compile Include="LongMsg.cs" />
+    <Compile Include="Common\Unmanaged.cs" />
+    <Compile Include="Devices\Clock.cs" />
+    <Compile Include="Devices\DeviceBase.cs" />
+    <Compile Include="Devices\DeviceException.cs" />
+    <Compile Include="Devices\InputDevice.cs" />
+    <Compile Include="Devices\LongMsg.cs" />
+    <Compile Include="Devices\MessageQueue.cs" />
+    <Compile Include="Devices\OutputDevice.cs" />
+    <Compile Include="Devices\ShortMsg.cs" />
+    <Compile Include="Enums\Channel.cs" />
+    <Compile Include="Enums\Control.cs" />
+    <Compile Include="Enums\Instrument.cs" />
+    <Compile Include="Enums\Interval.cs" />
+    <Compile Include="Enums\Percussion.cs" />
+    <Compile Include="Enums\Pitch.cs" />
+    <Compile Include="Instruments\Chord.cs" />
+    <Compile Include="Instruments\ChordPattern.cs" />
+    <Compile Include="Instruments\Note.cs" />
+    <Compile Include="Instruments\Scale.cs" />
+    <Compile Include="Instruments\ScalePattern.cs" />
     <Compile Include="Messages\CallbackMessage.cs" />
     <Compile Include="Messages\ChannelMessage.cs" />
     <Compile Include="Messages\ControlChangeMessage.cs" />
@@ -79,15 +91,6 @@
     <Compile Include="Messages\PitchBendMessage.cs" />
     <Compile Include="Messages\ProgramChangeMessage.cs" />
     <Compile Include="Messages\SysExMessage.cs" />
-    <Compile Include="Note.cs" />
-    <Compile Include="Percussion.cs" />
-    <Compile Include="InputDevice.cs" />
-    <Compile Include="MessageQueue.cs" />
-    <Compile Include="OutputDevice.cs" />
-    <Compile Include="Pitch.cs" />
-    <Compile Include="ShortMsg.cs" />
-    <Compile Include="Unmanaged.cs" />
-    <Compile Include="Scale.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Win32\HMIDIIN.cs" />
     <Compile Include="Win32\HMIDIOUT.cs" />

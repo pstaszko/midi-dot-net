@@ -24,6 +24,7 @@
 
 using System;
 using Midi;
+using Midi.Devices;
 
 namespace MidiExamples
 {

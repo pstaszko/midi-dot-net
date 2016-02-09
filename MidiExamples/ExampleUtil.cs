@@ -25,6 +25,8 @@
 using System;
 using System.Collections.Generic;
 using Midi;
+using Midi.Devices;
+using Midi.Enums;
 
 namespace MidiExamples
 {

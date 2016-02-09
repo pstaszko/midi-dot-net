@@ -25,6 +25,9 @@
 using System;
 using Midi;
 using System.Threading;
+using Midi.Devices;
+using Midi.Enums;
+using Midi.Instruments;
 using Midi.Messages;
 
 namespace MidiExamples

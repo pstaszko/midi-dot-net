@@ -23,6 +23,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using Midi;
+using Midi.Enums;
+using Midi.Instruments;
 using NUnit.Framework;
 
 namespace MidiUnitTests
