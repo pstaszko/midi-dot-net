@@ -70,7 +70,6 @@
     <Compile Include="Devices\IOutputDevice.cs" />
     <Compile Include="Devices\LongMsg.cs" />
     <Compile Include="Devices\MessageQueue.cs" />
-    <Compile Include="Devices\NRPN\NrpnDecocer.cs" />
     <Compile Include="Devices\OutputDevice.cs" />
     <Compile Include="Devices\ShortMsg.cs" />
     <Compile Include="Enums\Channel.cs" />
