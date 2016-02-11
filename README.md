@@ -56,7 +56,8 @@ For information of the original project by Tom Lokovic, as well as the original 
 Copyright
 ---
 Original code copyright (c) 2009 Tom Lokovic.
-Additional modifications copyright Justin Ryan.
+Additional modifications copyright (c) 2015 Justin Ryan.
+Additional modifications copyright (c) 2016 Michael Dahl.
 
 License
 ---
