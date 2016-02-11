@@ -2,13 +2,21 @@ Overview
 ---
 This .NET library provides convenient, threadsafe access to MIDI devices. It does this by binding to the Win32 API with P/Invoke and then wrapping that in an object-oriented API which feels right at home in C# / .NET.
 
+Additions to Tom Lokovic's version:
+---
+This is a further development of the _midi dot net_ library created by Tom Lokovic, with the following mentionable additions:
+* **Non-Registered Parameter Number (NRPN) Messages**
+  * Ability to both send and receive so-called NRPN messages which enable 14-bit values as well as parameters, greatly increasing both the number of controls you can run on a single channel, but also the resolution (for many precision applications, 128 values might be too coarse).
+* **SysEx Messages** (_jstnry_)
+
+
 Features
 ---
 **MIDI**
 
 * Easy access to MIDI input and output devices.
 * Register input handlers using C# events / delegates.
-* Full support for sending and receiving Note On, Note Off, Control Change, Program Change, and Pitch Bend messages.
+* Full support for sending and receiving Note On, Note Off, Control Change, Program Change, Pitch Bend messages, SysEx and NRPN messages.
 * Convenient enums for General MIDI Channels, Pitches, Instruments, Controls, and Percussions.
 
 **Scheduling**
@@ -48,7 +56,8 @@ For information of the original project by Tom Lokovic, as well as the original 
 Copyright
 ---
 Original code copyright (c) 2009 Tom Lokovic.
-Additional modifications copyright Justin Ryan.
+Additional modifications copyright (c) 2015 Justin Ryan.
+Additional modifications copyright (c) 2016 Michael Dahl.
 
 License
 ---
