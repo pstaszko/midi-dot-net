@@ -29,6 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Midi.XML</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,11 +59,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Int14.cs" />
     <Compile Include="Common\Unmanaged.cs" />
     <Compile Include="Devices\Clock.cs" />
     <Compile Include="Devices\DeviceBase.cs" />
     <Compile Include="Devices\DeviceException.cs" />
+    <Compile Include="Devices\DeviceManager.cs" />
+    <Compile Include="Devices\IInputDevice.cs" />
     <Compile Include="Devices\InputDevice.cs" />
+    <Compile Include="Devices\IOutputDevice.cs" />
     <Compile Include="Devices\LongMsg.cs" />
     <Compile Include="Devices\MessageQueue.cs" />
     <Compile Include="Devices\OutputDevice.cs" />

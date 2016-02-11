@@ -24,7 +24,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using Midi.Common;
@@ -34,78 +33,10 @@ using Midi.Win32;
 
 namespace Midi.Devices
 {
-    /// <summary>
-    ///     A MIDI input device.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Each instance of this class describes a MIDI input device installed on the system.
-    ///         You cannot create your own instances, but instead must go through the
-    ///         <see cref="InstalledDevices" /> property to find which devices are available.  You may wish
-    ///         to examine the <see cref="DeviceBase.Name" /> property of each one and present the user with
-    ///         a choice of which device(s) to use.
-    ///     </para>
-    ///     <para>
-    ///         Open an input device with <see cref="Open" /> and close it with <see cref="Close" />.
-    ///         While it is open, you may arrange to start receiving messages with
-    ///         <see cref="StartReceiving(Clock,bool)" /> and then stop receiving them with <see cref="StopReceiving" />.
-    ///         An input device can only receive messages when it is both open and started.
-    ///     </para>
-    ///     <para>
-    ///         Incoming messages are routed to the corresponding events, such as <see cref="NoteOn" />
-    ///         and <see cref="ProgramChange" />.  The event handlers are invoked on a background thread
-    ///         which is started in <see cref="StartReceiving(Clock,bool)" /> and stopped in <see cref="StopReceiving" />.
-    ///     </para>
-    ///     <para>
-    ///         As each message is received, it is assigned a timestamp in one of two ways.  If
-    ///         <see cref="StartReceiving(Clock,bool)" /> is called with a <see cref="Clock" />, then each message is
-    ///         assigned a time by querying the clock's <see cref="Clock.Time" /> property.  If
-    ///         <see cref="StartReceiving(Clock,bool)" /> is called with null, then each message is assigned a time
-    ///         based on the number of seconds since <see cref="StartReceiving(Clock,bool)" /> was called.
-    ///     </para>
-    /// </remarks>
-    /// <threadsafety static="true" instance="true" />
-    /// <seealso cref="Clock" />
-    /// <seealso cref="InputDevice" />
-    public class InputDevice : DeviceBase
+    
+    public class InputDevice : DeviceBase, IInputDevice
     {
-        /// <summary>
-        ///     Delegate called when an input device receives a Control Change message.
-        /// </summary>
-        public delegate void ControlChangeHandler(ControlChangeMessage msg);
-
-        /// <summary>
-        ///     Delegate called when an input device receives a Note Off message.
-        /// </summary>
-        public delegate void NoteOffHandler(NoteOffMessage msg);
-
-        /// <summary>
-        ///     Delegate called when an input device receives a Note On message.
-        /// </summary>
-        public delegate void NoteOnHandler(NoteOnMessage msg);
-
-        /// <summary>
-        ///     Delegate called when an input device receives a Pitch Bend message.
-        /// </summary>
-        public delegate void PitchBendHandler(PitchBendMessage msg);
-
-        /// <summary>
-        ///     Delegate called when an input device receives a Program Change message.
-        /// </summary>
-        public delegate void ProgramChangeHandler(ProgramChangeMessage msg);
-
-        /// <summary>
-        ///     Delegate called when an input device receives a SysEx message.
-        /// </summary>
-        public delegate void SysExHandler(SysExMessage msg);
-
-        // Access to the global state is guarded by lock(staticLock).
-        private static readonly object StaticLock = new object();
-        private static InputDevice[] _installedDevices;
-
-        /// <summary>
-        ///     Thread-local, set to true when called by an input handler, false in all other threads.
-        /// </summary>
+        // Thread-local, set to true when called by an input handler, false in all other threads.
         [ThreadStatic] private static bool _isInsideInputHandler;
 
         // These fields initialized in the constructor never change after construction,
@@ -113,6 +44,7 @@ namespace Midi.Devices
         // callback delegate because we pass it to unmanaged code (midiInOpen) and unmanaged code
         // cannot prevent the garbage collector from collecting the delegate.
         private readonly UIntPtr _deviceId;
+
         private readonly Win32API.MidiInProc _inputCallbackDelegate;
 
         //Holds a list of pointers to all the buffers created for handling Long Messages.
@@ -122,17 +54,15 @@ namespace Midi.Devices
         private Clock _clock;
         private HMIDIIN _handle;
         private bool _isClosing;
-
-        // Access to the Open/Close state is guarded by lock(this).
         private bool _isOpen;
         private bool _isReceiving;
 
         /// <summary>
-        ///     Private Constructor, only called by the getter for the InstalledDevices property.
+        ///     Internal Constructor, only called by the getter for the InstalledDevices property.
         /// </summary>
         /// <param name="deviceId">Position of this device in the list of all devices.</param>
         /// <param name="caps">Win32 Struct with device metadata</param>
-        private InputDevice(UIntPtr deviceId, MIDIINCAPS caps)
+        internal InputDevice(UIntPtr deviceId, MIDIINCAPS caps)
             : base(caps.szPname)
         {
             _deviceId = deviceId;
@@ -142,27 +72,6 @@ namespace Midi.Devices
             _clock = null;
         }
 
-        /// <summary>
-        ///     List of input devices installed on this system.
-        /// </summary>
-        public static ReadOnlyCollection<InputDevice> InstalledDevices
-        {
-            get
-            {
-                lock (StaticLock)
-                {
-                    if (_installedDevices == null)
-                    {
-                        _installedDevices = MakeDeviceList();
-                    }
-                    return new ReadOnlyCollection<InputDevice>(_installedDevices);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     True if this device has been successfully opened.
-        /// </summary>
         public bool IsOpen
         {
             get
@@ -178,9 +87,6 @@ namespace Midi.Devices
             }
         }
 
-        /// <summary>
-        ///     True if this device is receiving messages.
-        /// </summary>
         public bool IsReceiving
         {
             get
@@ -196,39 +102,13 @@ namespace Midi.Devices
             }
         }
 
-        /// <summary>
-        ///     Event called when an input device receives a Note On message.
-        /// </summary>
         public event NoteOnHandler NoteOn;
-
-        /// <summary>
-        ///     Event called when an input device receives a Note Off message.
-        /// </summary>
         public event NoteOffHandler NoteOff;
-
-        /// <summary>
-        ///     Event called when an input device receives a Control Change message.
-        /// </summary>
         public event ControlChangeHandler ControlChange;
-
-        /// <summary>
-        ///     Event called when an input device receives a Program Change message.
-        /// </summary>
         public event ProgramChangeHandler ProgramChange;
-
-        /// <summary>
-        ///     Event called when an input device receives a Pitch Bend message.
-        /// </summary>
         public event PitchBendHandler PitchBend;
-
-        /// <summary>
-        ///     Event called when an input device receives a SysEx message.
-        /// </summary>
         public event SysExHandler SysEx;
 
-        /// <summary>
-        ///     Removes all event handlers from the input events on this device.
-        /// </summary>
         public void RemoveAllEventHandlers()
         {
             NoteOn = null;
@@ -239,26 +119,6 @@ namespace Midi.Devices
             SysEx = null;
         }
 
-        /// <summary>
-        ///     Refresh the list of input devices
-        /// </summary>
-        public static void UpdateInstalledDevices()
-        {
-            lock (StaticLock)
-            {
-                _installedDevices = null;
-            }
-        }
-
-        /// <summary>
-        ///     Opens this input device.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The device is already open.</exception>
-        /// <exception cref="DeviceException">The device cannot be opened.</exception>
-        /// <remarks>
-        ///     Note that Open() establishes a connection to the device, but no messages will
-        ///     be received until <see cref="StartReceiving(Clock)" /> is called.
-        /// </remarks>
         public void Open()
         {
             if (_isInsideInputHandler)
@@ -274,14 +134,6 @@ namespace Midi.Devices
             }
         }
 
-        /// <summary>
-        ///     Closes this input device.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">
-        ///     The device is not open or is still
-        ///     receiving.
-        /// </exception>
-        /// <exception cref="DeviceException">The device cannot be closed.</exception>
         public void Close()
         {
             if (_isInsideInputHandler)
@@ -313,54 +165,11 @@ namespace Midi.Devices
             }
         }
 
-        /// <summary>
-        ///     <see cref="StartReceiving(Clock,bool)" />
-        /// </summary>
-        /// <param name="clock">
-        ///     If non-null, the clock's <see cref="Clock.Time" /> property will
-        ///     be used to assign a timestamp to each incoming message.  If null, timestamps will be in
-        ///     seconds since StartReceiving() was called.
-        /// </param>
-        /// <exception cref="InvalidOperationException">
-        ///     The device is not open or is already
-        ///     receiving.
-        /// </exception>
-        /// <exception cref="DeviceException">The device cannot start receiving.</exception>
         public void StartReceiving(Clock clock)
         {
             StartReceiving(clock, false);
         }
-
-        /// <summary>
-        ///     Starts this input device receiving messages.
-        /// </summary>
-        /// <param name="clock">
-        ///     If non-null, the clock's <see cref="Clock.Time" /> property will
-        ///     be used to assign a timestamp to each incoming message.  If null, timestamps will be in
-        ///     seconds since StartReceiving() was called.
-        /// </param>
-        /// <param name="handleSysEx">
-        ///     Boolean, when TRUE buffers will be created to enable handling
-        ///     of incoming MIDI Long Messages (SysEx). When FALSE, all long messages are ignored.
-        /// </param>
-        /// <exception cref="InvalidOperationException">
-        ///     The device is not open or is already
-        ///     receiving.
-        /// </exception>
-        /// <exception cref="DeviceException">The device cannot start receiving.</exception>
-        /// <remarks>
-        ///     <para>
-        ///         This method launches a background thread to listen for input events, and as events
-        ///         are received, the event handlers are invoked on that background thread.  Event handlers
-        ///         should be written to work from a background thread.  (For example, if they want to
-        ///         update the GUI, they may need to BeginInvoke to arrange for GUI updates to happen on
-        ///         the correct thread.)
-        ///     </para>
-        ///     <para>
-        ///         The background thread which is created by this method is joined (shut down) in
-        ///         <see cref="StopReceiving" />.
-        ///     </para>
-        /// </remarks>
+        
         public void StartReceiving(Clock clock, bool handleSysEx)
         {
             if (_isInsideInputHandler)
@@ -382,28 +191,7 @@ namespace Midi.Devices
                 _clock = clock;
             }
         }
-
-        /// <summary>
-        ///     Stops this input device from receiving messages.
-        /// </summary>
-        /// <remarks>
-        ///     <para>
-        ///         This method waits for all in-progress input event handlers to finish, and then
-        ///         joins (shuts down) the background thread that was created in
-        ///         <see cref="StartReceiving(Clock)" />.  Thus, when this function returns you can be sure that no
-        ///         more event handlers will be invoked.
-        ///     </para>
-        ///     <para>
-        ///         It is illegal to call this method from an input event handler (ie, from the
-        ///         background thread), and doing so throws an exception. If an event handler really needs
-        ///         to call this method, consider using BeginInvoke to schedule it on another thread.
-        ///     </para>
-        /// </remarks>
-        /// <exception cref="InvalidOperationException">
-        ///     The device is not open; is not receiving;
-        ///     or called from within an event handler (ie, from the background thread).
-        /// </exception>
-        /// <exception cref="DeviceException">The device cannot start receiving.</exception>
+        
         public void StopReceiving()
         {
             if (_isInsideInputHandler)
@@ -419,12 +207,7 @@ namespace Midi.Devices
                 _isReceiving = false;
             }
         }
-
-        /// <summary>
-        ///     Makes sure rc is MidiWin32Wrapper.MMSYSERR_NOERROR.  If not, throws an exception with an
-        ///     appropriate error message.
-        /// </summary>
-        /// <param name="rc"></param>
+        
         private static void CheckReturnCode(MMRESULT rc)
         {
             if (rc != MMRESULT.MMSYSERR_NOERROR)
@@ -438,10 +221,7 @@ namespace Midi.Devices
                 throw new DeviceException(errorMsg.ToString());
             }
         }
-
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is not open.
-        /// </summary>
+        
         private void CheckOpen()
         {
             if (!_isOpen)
@@ -449,10 +229,7 @@ namespace Midi.Devices
                 throw new InvalidOperationException("Device is not open.");
             }
         }
-
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is open.
-        /// </summary>
+        
         private void CheckNotOpen()
         {
             if (_isOpen)
@@ -460,10 +237,7 @@ namespace Midi.Devices
                 throw new InvalidOperationException("Device is open.");
             }
         }
-
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is not receiving.
-        /// </summary>
+        
         private void CheckReceiving()
         {
             if (!_isReceiving)
@@ -471,10 +245,7 @@ namespace Midi.Devices
                 throw new DeviceException("device not receiving");
             }
         }
-
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is receiving.
-        /// </summary>
+        
         private void CheckNotReceiving()
         {
             if (_isReceiving)
@@ -482,27 +253,7 @@ namespace Midi.Devices
                 throw new DeviceException("device receiving");
             }
         }
-
-        /// <summary>
-        ///     Private method for constructing the array of MidiInputDevices by calling the Win32 api.
-        /// </summary>
-        /// <returns></returns>
-        private static InputDevice[] MakeDeviceList()
-        {
-            var inDevs = Win32API.midiInGetNumDevs();
-            var result = new InputDevice[inDevs];
-            for (uint deviceId = 0; deviceId < inDevs; deviceId++)
-            {
-                MIDIINCAPS caps;
-                Win32API.midiInGetDevCaps((UIntPtr) deviceId, out caps);
-                result[deviceId] = new InputDevice((UIntPtr) deviceId, caps);
-            }
-            return result;
-        }
-
-        /// <summary>
-        ///     The input callback for midiOutOpen.
-        /// </summary>
+        
         private void InputCallback(HMIDIIN hMidiIn, MidiInMessage wMsg,
             UIntPtr dwInstance, UIntPtr dwParam1, UIntPtr dwParam2)
         {
@@ -678,12 +429,6 @@ namespace Midi.Devices
             //return unchecked((UIntPtr)(ulong)(long)newPtr);
         }
 
-        /// <summary>
-        ///     Releases the resources associated with the specified MidiHeader pointer.
-        /// </summary>
-        /// <param name="ptr">
-        ///     The pointer to MIDIHDR buffer.
-        /// </param>
         private void DestroyLongMsgBuffer(UIntPtr ptr)
         {
             var newPtr = ptr.ToIntPtr();

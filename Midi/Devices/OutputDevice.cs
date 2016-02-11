@@ -23,47 +23,17 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using Midi.Enums;
-using Midi.Messages;
 using Midi.Win32;
 
 namespace Midi.Devices
 {
-    /// <summary>
-    ///     A MIDI output device.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Each instance of this class describes a MIDI output device installed on the system.
-    ///         You cannot create your own instances, but instead must go through the
-    ///         <see cref="InstalledDevices" /> property to find which devices are available.  You may wish
-    ///         to examine the <see cref="DeviceBase.Name" /> property of each one and present the user with
-    ///         a choice of which device to use.
-    ///     </para>
-    ///     <para>
-    ///         Open an output device with <see cref="Open" /> and close it with <see cref="Close" />.
-    ///         While it is open, you may send MIDI messages with functions such as
-    ///         <see cref="SendNoteOn" />, <see cref="SendNoteOff" /> and <see cref="SendProgramChange" />.
-    ///         All notes may be silenced on the device by calling <see cref="SilenceAllNotes" />.
-    ///     </para>
-    ///     <para>
-    ///         Note that the above methods send their messages immediately.  If you wish to arrange
-    ///         for a message to be sent at a specific future time, you'll need to instantiate some subclass
-    ///         of <see cref="Message" /> (eg <see cref="NoteOnMessage" />) and then pass it to
-    ///         <see cref="Clock.Schedule(Message)">Clock.Schedule</see>.
-    ///     </para>
-    /// </remarks>
-    /// <threadsafety static="true" instance="true" />
-    /// <seealso cref="Clock" />
-    /// <seealso cref="InputDevice" />
-    public class OutputDevice : DeviceBase
+    
+    public class OutputDevice : DeviceBase, IOutputDevice
     {
         // Access to the global state is guarded by lock(staticLock).
-        private static readonly object StaticLock = new object();
-        private static OutputDevice[] _installedDevices;
 
         // The fields initialized in the constructor never change after construction,
         // so they don't need to be guarded by a lock.
@@ -71,44 +41,21 @@ namespace Midi.Devices
         // ReSharper disable once NotAccessedField.Local
         private MidiOutCaps _caps;
         private HMIDIOUT _handle;
-
-        // Access to the Open/Close state is guarded by lock(this).
         private bool _isOpen;
 
         /// <summary>
-        ///     Private Constructor, only called by the getter for the InstalledDevices property.
+        ///     Internal Constructor, only called by the getter for the InstalledDevices property.
         /// </summary>
         /// <param name="deviceId">Position of this device in the list of all devices.</param>
         /// <param name="caps">Win32 Struct with device metadata</param>
-        private OutputDevice(UIntPtr deviceId, MidiOutCaps caps)
+        internal OutputDevice(UIntPtr deviceId, MidiOutCaps caps)
             : base(caps.szPname)
         {
             _deviceId = deviceId;
             _caps = caps;
             _isOpen = false;
         }
-
-        /// <summary>
-        ///     List of devices installed on this system.
-        /// </summary>
-        public static ReadOnlyCollection<OutputDevice> InstalledDevices
-        {
-            get
-            {
-                lock (StaticLock)
-                {
-                    if (_installedDevices == null)
-                    {
-                        _installedDevices = MakeDeviceList();
-                    }
-                    return new ReadOnlyCollection<OutputDevice>(_installedDevices);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     True if this device is open.
-        /// </summary>
+        
         public bool IsOpen
         {
             get
@@ -119,23 +66,7 @@ namespace Midi.Devices
                 }
             }
         }
-
-        /// <summary>
-        ///     Refresh the list of input devices
-        /// </summary>
-        public static void UpdateInstalledDevices()
-        {
-            lock (StaticLock)
-            {
-                _installedDevices = null;
-            }
-        }
-
-        /// <summary>
-        ///     Opens this output device.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The device is already open.</exception>
-        /// <exception cref="DeviceException">The device cannot be opened.</exception>
+        
         public void Open()
         {
             lock (this)
@@ -145,12 +76,7 @@ namespace Midi.Devices
                 _isOpen = true;
             }
         }
-
-        /// <summary>
-        ///     Closes this output device.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The device cannot be closed.</exception>
+        
         public void Close()
         {
             lock (this)
@@ -160,12 +86,7 @@ namespace Midi.Devices
                 _isOpen = false;
             }
         }
-
-        /// <summary>
-        ///     Silences all notes on this output device.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SilenceAllNotes()
         {
             lock (this)
@@ -174,19 +95,7 @@ namespace Midi.Devices
                 CheckReturnCode(Win32API.midiOutReset(_handle));
             }
         }
-
-        /// <summary>
-        ///     Sends a Note On message to this MIDI output device.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="pitch">The pitch.</param>
-        /// <param name="velocity">The velocity 0..127.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     channel, pitch, or velocity is
-        ///     out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendNoteOn(Channel channel, Pitch pitch, int velocity)
         {
             lock (this)
@@ -196,19 +105,7 @@ namespace Midi.Devices
                     pitch, velocity)));
             }
         }
-
-        /// <summary>
-        ///     Sends a Note Off message to this MIDI output device.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="pitch">The pitch.</param>
-        /// <param name="velocity">The velocity 0..127.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     channel, note, or velocity is
-        ///     out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendNoteOff(Channel channel, Pitch pitch, int velocity)
         {
             lock (this)
@@ -218,22 +115,7 @@ namespace Midi.Devices
                     pitch, velocity)));
             }
         }
-
-        /// <summary>
-        ///     Sends a Note On message to Channel10 of this MIDI output device.
-        /// </summary>
-        /// <param name="percussion">The percussion.</param>
-        /// <param name="velocity">The velocity 0..127.</param>
-        /// <remarks>
-        ///     This is simply shorthand for a Note On message on Channel10 with a
-        ///     percussion-specific note, so there is no corresponding message to receive from an input
-        ///     device.
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     percussion or velocity is out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendPercussion(Percussion percussion, int velocity)
         {
             lock (this)
@@ -244,19 +126,7 @@ namespace Midi.Devices
                     velocity)));
             }
         }
-
-        /// <summary>
-        ///     Sends a Control Change message to this MIDI output device.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="control">The control.</param>
-        /// <param name="value">The new value 0..127.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     channel, control, or value is
-        ///     out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendControlChange(Channel channel, Control control, int value)
         {
             lock (this)
@@ -266,17 +136,7 @@ namespace Midi.Devices
                     channel, control, value)));
             }
         }
-
-        /// <summary>
-        ///     Sends a Pitch Bend message to this MIDI output device.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="value">The pitch bend value, 0..16383, 8192 is centered.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     channel or value is out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendPitchBend(Channel channel, int value)
         {
             lock (this)
@@ -286,23 +146,7 @@ namespace Midi.Devices
                     value)));
             }
         }
-
-        /// <summary>
-        ///     Sends a Program Change message to this MIDI output device.
-        /// </summary>
-        /// <param name="channel">The channel.</param>
-        /// <param name="instrument">The instrument.</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        ///     channel or instrument is out-of-range.
-        /// </exception>
-        /// <exception cref="InvalidOperationException">The device is not open.</exception>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
-        /// <remarks>
-        ///     A Program Change message is used to switch among instrument settings, generally
-        ///     instrument voices.  An instrument conforming to General Midi 1 will have the
-        ///     instruments described in the <see cref="Instrument" /> enum; other instruments
-        ///     may have different instrument sets.
-        /// </remarks>
+        
         public void SendProgramChange(Channel channel, Instrument instrument)
         {
             lock (this)
@@ -312,12 +156,7 @@ namespace Midi.Devices
                     channel, instrument)));
             }
         }
-
-        /// <summary>
-        ///     Sends a System Exclusive (sysex) message to this MIDI output device.
-        /// </summary>
-        /// <param name="data">The message to send (as byte array)</param>
-        /// <exception cref="DeviceException">The message cannot be sent.</exception>
+        
         public void SendSysEx(byte[] data)
         {
             lock (this)
@@ -365,36 +204,6 @@ namespace Midi.Devices
             }
         }
 
-        ///// <summary>
-        ///// Returns the handle to the current OutputDevice as a Strut
-        ///// </summary>
-        ////public static Int32 DeviceHandle(OutputDevice od)
-        //public static Win32API.HMIDIOUT DeviceHandle(OutputDevice od)
-        //{
-        //    lock (staticLock)
-        //    {
-        //        //return od.handle.handle;
-        //        return od.handle;
-        //    }
-        //}
-        ///// <summary>
-        ///// Returns the handle to the current OutputDevice as an Integer
-        ///// </summary>
-        //public static Int32 DeviceHandleHandle(OutputDevice od)
-        ////public static Win32API.HMIDIOUT DeviceHandle(OutputDevice od)
-        //{
-        //    lock (staticLock)
-        //    {
-        //        //return od.handle.handle;
-        //        return od.handle.handle;
-        //    }
-        //}
-
-        /// <summary>
-        ///     Makes sure rc is MidiWin32Wrapper.MMSYSERR_NOERROR.  If not, throws an exception with an
-        ///     appropriate error message.
-        /// </summary>
-        /// <param name="rc"></param>
         private static void CheckReturnCode(MMRESULT rc)
         {
             if (rc != MMRESULT.MMSYSERR_NOERROR)
@@ -408,10 +217,7 @@ namespace Midi.Devices
                 throw new DeviceException(errorMsg.ToString());
             }
         }
-
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is not open.
-        /// </summary>
+        
         private void CheckOpen()
         {
             if (!_isOpen)
@@ -420,32 +226,12 @@ namespace Midi.Devices
             }
         }
 
-        /// <summary>
-        ///     Throws a MidiDeviceException if this device is open.
-        /// </summary>
         private void CheckNotOpen()
         {
             if (_isOpen)
             {
                 throw new InvalidOperationException("device open");
             }
-        }
-
-        /// <summary>
-        ///     Private method for constructing the array of MidiOutputDevices by calling the Win32 api.
-        /// </summary>
-        /// <returns></returns>
-        private static OutputDevice[] MakeDeviceList()
-        {
-            var outDevs = Win32API.midiOutGetNumDevs();
-            var result = new OutputDevice[outDevs];
-            for (uint deviceId = 0; deviceId < outDevs; deviceId++)
-            {
-                MidiOutCaps caps;
-                Win32API.midiOutGetDevCaps((UIntPtr) deviceId, out caps);
-                result[deviceId] = new OutputDevice((UIntPtr) deviceId, caps);
-            }
-            return result;
         }
     }
 }
