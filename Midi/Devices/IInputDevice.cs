@@ -84,6 +84,11 @@ namespace Midi.Devices
         event SysExHandler SysEx;
 
         /// <summary>
+        ///     Event called when an input device receives a NRPN message.
+        /// </summary>
+        event NrpnHandler Nrpn;
+
+        /// <summary>
         ///     Removes all event handlers from the input events on this device.
         /// </summary>
         void RemoveAllEventHandlers();
@@ -186,4 +191,5 @@ namespace Midi.Devices
     public delegate void PitchBendHandler(PitchBendMessage msg);
     public delegate void ProgramChangeHandler(ProgramChangeMessage msg);
     public delegate void SysExHandler(SysExMessage msg);
+    public delegate void NrpnHandler(NrpnMessage msg);
 }

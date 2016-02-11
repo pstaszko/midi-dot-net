@@ -159,5 +159,13 @@ namespace Midi.Devices
         /// <param name="data">The message to send (as byte array)</param>
         /// <exception cref="DeviceException">The message cannot be sent.</exception>
         void SendSysEx(byte[] data);
+
+        /// <summary>
+        ///  Sends a Non-Registered Parameter Number (NRPN) message to this MIDI output device.
+        /// </summary>
+        /// <param name="channel">The channel</param>
+        /// <param name="parameter">Parameter number, 0..16383</param>
+        /// <param name="value">Value, 0..16383</param>
+        void SendNrpn(Channel channel, int parameter, int value);
     }
 }

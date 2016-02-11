@@ -70,6 +70,7 @@
     <Compile Include="Devices\IOutputDevice.cs" />
     <Compile Include="Devices\LongMsg.cs" />
     <Compile Include="Devices\MessageQueue.cs" />
+    <Compile Include="Devices\NRPN\NrpnDecocer.cs" />
     <Compile Include="Devices\OutputDevice.cs" />
     <Compile Include="Devices\ShortMsg.cs" />
     <Compile Include="Enums\Channel.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Messages\NoteOffMessage.cs" />
     <Compile Include="Messages\NoteOnMessage.cs" />
     <Compile Include="Messages\NoteOnOffMessage.cs" />
+    <Compile Include="Messages\NrpnMessage.cs" />
     <Compile Include="Messages\PercussionMessage.cs" />
     <Compile Include="Messages\PitchBendMessage.cs" />
     <Compile Include="Messages\ProgramChangeMessage.cs" />

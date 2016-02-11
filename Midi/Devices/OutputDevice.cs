@@ -25,6 +25,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using micdah.LrControl;
 using Midi.Enums;
 using Midi.Win32;
 
@@ -201,6 +202,33 @@ namespace Midi.Devices
 
                 Marshal.FreeHGlobal(header.lpData);
                 Marshal.FreeHGlobal(ptr);
+            }
+        }
+
+        public void SendNrpn(Channel channel, int parameter, int value)
+        {
+            lock (this)
+            {
+                CheckOpen();
+
+                var parameter14 = new Int14(parameter);
+                var value14 = new Int14(value);
+
+                // Parameter, MSB
+                CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeControlChange(
+                    channel, Control.NonRegisteredParameterMSB, parameter14.MSB)));
+
+                // Parameter, LSB
+                CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeControlChange(
+                    channel, Control.NonRegisteredParameterLSB, parameter14.LSB)));
+
+                // Value, MSB
+                CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeControlChange(
+                    channel, Control.DataEntryMSB, value14.MSB)));
+
+                // Value, LSB
+                CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeControlChange(
+                    channel, Control.DataEntryLSB, value14.LSB)));
             }
         }
 
