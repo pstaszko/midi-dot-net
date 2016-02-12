@@ -85,27 +85,10 @@ namespace Midi.Instruments
         /// </summary>
         public override bool Equals(object obj)
         {
-            var other = obj as ScalePattern;
-            if ((object) other == null)
-            {
-                return false;
-            }
-            if (!Name.Equals(other.Name))
-            {
-                return false;
-            }
-            if (Ascent.Length != other.Ascent.Length)
-            {
-                return false;
-            }
-            for (var i = 0; i < Ascent.Length; ++i)
-            {
-                if (Ascent[i] != other.Ascent[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ScalePattern) obj);
         }
 
         /// <summary>
@@ -113,8 +96,15 @@ namespace Midi.Instruments
         /// </summary>
         public override int GetHashCode()
         {
-            // TODO
-            return 0;
+            unchecked
+            {
+                return ((Name?.GetHashCode() ?? 0)*397) ^ (Ascent?.GetHashCode() ?? 0);
+            }
+        }
+
+        protected bool Equals(ScalePattern other)
+        {
+            return string.Equals(Name, other.Name) && Equals(Ascent, other.Ascent);
         }
 
         /// <summary>Returns true if ascent is valid.</summary>

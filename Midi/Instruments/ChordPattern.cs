@@ -123,42 +123,10 @@ namespace Midi.Instruments
         /// </summary>
         public override bool Equals(object obj)
         {
-            var other = obj as ChordPattern;
-            if ((object) other == null)
-            {
-                return false;
-            }
-            if (!Name.Equals(other.Name))
-            {
-                return false;
-            }
-            if (!Abbreviation.Equals(other.Abbreviation))
-            {
-                return false;
-            }
-            if (Ascent.Length != other.Ascent.Length)
-            {
-                return false;
-            }
-            for (var i = 0; i < Ascent.Length; ++i)
-            {
-                if (Ascent[i] != other.Ascent[i])
-                {
-                    return false;
-                }
-            }
-            if (LetterOffsets.Length != other.LetterOffsets.Length)
-            {
-                return false;
-            }
-            for (var i = 0; i < LetterOffsets.Length; ++i)
-            {
-                if (LetterOffsets[i] != other.LetterOffsets[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals((ChordPattern) obj);
         }
 
         /// <summary>
@@ -166,8 +134,19 @@ namespace Midi.Instruments
         /// </summary>
         public override int GetHashCode()
         {
-            // TODO
-            return 0;
+            unchecked
+            {
+                var hashCode = Name?.GetHashCode() ?? 0;
+                hashCode = (hashCode*397) ^ (Abbreviation?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (Ascent?.GetHashCode() ?? 0);
+                hashCode = (hashCode*397) ^ (LetterOffsets?.GetHashCode() ?? 0);
+                return hashCode;
+            }
+        }
+
+        protected bool Equals(ChordPattern other)
+        {
+            return string.Equals(Name, other.Name) && string.Equals(Abbreviation, other.Abbreviation) && Equals(Ascent, other.Ascent) && Equals(LetterOffsets, other.LetterOffsets);
         }
 
         /// <summary>
