@@ -55,5 +55,10 @@ namespace Midi.Messages
         {
             return new ControlChangeMessage(Device, Channel, Control, Value, Time + delta);
         }
+
+        public override string ToString()
+        {
+            return $"Control: {Control}, Value: {Value}";
+        }
     }
 }

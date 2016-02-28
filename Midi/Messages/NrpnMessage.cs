@@ -45,5 +45,10 @@ namespace Midi.Messages
         {
             return new NrpnMessage(Device, Channel, Parameter, Value, Time + delta);
         }
+
+        public override string ToString()
+        {
+            return $"Parameter: {Parameter}, Value: {Value}";
+        }
     }
 }
