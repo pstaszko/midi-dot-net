@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace Midi.Instruments
 {
@@ -107,7 +109,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator ==(ChordPattern a, ChordPattern b)
         {
-            return a != null && (ReferenceEquals(a, b) || a.Equals(b));
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object) b);
         }
 
         /// <summary>
@@ -146,7 +148,10 @@ namespace Midi.Instruments
 
         protected bool Equals(ChordPattern other)
         {
-            return string.Equals(Name, other.Name) && string.Equals(Abbreviation, other.Abbreviation) && Equals(Ascent, other.Ascent) && Equals(LetterOffsets, other.LetterOffsets);
+            return string.Equals(Name, other.Name)
+                   && string.Equals(Abbreviation, other.Abbreviation)
+                   && Ascent.SequenceEqual(other.Ascent)
+                   && LetterOffsets.SequenceEqual(other.LetterOffsets);
         }
 
         /// <summary>

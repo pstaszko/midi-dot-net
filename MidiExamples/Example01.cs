@@ -23,31 +23,31 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using Midi;
 using Midi.Devices;
 
 namespace MidiExamples
 {
     /// <summary>
-    /// Prints information about MIDI input and output devices.
+    ///     Prints information about MIDI input and output devices.
     /// </summary>
-    class Example01 : ExampleBase
+    internal class Example01 : ExampleBase
     {
         public Example01()
             : base("Example01.cs", "Prints info about devices.")
-        { }
+        {
+        }
 
         public override void Run()
         {
             // Print a table of the input device names, or "No input devices" if there are none.
-            if (InputDevice.InstalledDevices.Count == 0)
+            if (DeviceManager.InputDevices.Count == 0)
             {
                 Console.WriteLine("No input devices.");
             }
             else
             {
                 Console.WriteLine("Input Devices:");
-                foreach (InputDevice device in InputDevice.InstalledDevices)
+                foreach (var device in DeviceManager.InputDevices)
                 {
                     Console.WriteLine("  {0}", device.Name);
                 }
@@ -55,14 +55,14 @@ namespace MidiExamples
             Console.WriteLine();
 
             // Print a table of the output device names, or "No output devices" if there are none.
-            if (OutputDevice.InstalledDevices.Count == 0)
+            if (DeviceManager.OutputDevices.Count == 0)
             {
                 Console.WriteLine("No output devices.");
             }
             else
             {
                 Console.WriteLine("Output Devices:");
-                foreach (OutputDevice device in OutputDevice.InstalledDevices)
+                foreach (var device in DeviceManager.OutputDevices)
                 {
                     Console.WriteLine("  {0}", device.Name);
                 }

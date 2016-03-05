@@ -320,7 +320,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator ==(Chord a, Chord b)
         {
-            return a != null && (ReferenceEquals(a, b) || a.Equals(b));
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object)b);
         }
 
         /// <summary>
@@ -328,7 +328,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator !=(Chord a, Chord b)
         {
-            return a != null && !(ReferenceEquals(a, b) || a.Equals(b));
+            return !(a == b);
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Midi.Messages
         /// <param name="channel">Channel, 0..15, 10 reserved for percussion.</param>
         /// <param name="value">Pitch bend value, 0..16383, 8192 is centered.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public PitchBendMessage(DeviceBase device, Channel channel, int value, float time)
+        public PitchBendMessage(IDeviceBase device, Channel channel, int value, float time)
             : base(device, channel, time)
         {
             if (value < 0 || value > 16383)
@@ -36,7 +36,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendPitchBend(Channel, Value);
+            (Device as IOutputDevice)?.SendPitchBend(Channel, Value);
         }
 
         /// <summary>

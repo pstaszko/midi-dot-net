@@ -24,30 +24,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using Midi;
 
 namespace MidiExamples
 {
-    class Program
+    internal static class Program
     {
         /// <summary>
-        /// A dictionary mapping a console key to example instances.
+        ///     A dictionary mapping a console key to example instances.
         /// </summary>
-        static Dictionary<ConsoleKey, ExampleBase> examples =
+        private static readonly Dictionary<ConsoleKey, ExampleBase> Examples =
             new Dictionary<ConsoleKey, ExampleBase>
-        {
-            { ConsoleKey.A, new Example01()},
-            { ConsoleKey.B, new Example02()},
-            { ConsoleKey.C, new Example03()},
+            {
+                {ConsoleKey.A, new Example01()},
+                {ConsoleKey.B, new Example02()},
+                {ConsoleKey.C, new Example03()},
 //            { ConsoleKey.D, new Example04()},
-            { ConsoleKey.E, new Example05()},
-            { ConsoleKey.F, new Example06()},
-        };
+                {ConsoleKey.E, new Example05()},
+                {ConsoleKey.F, new Example06()}
+            };
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             while (true)
             {
@@ -55,7 +51,7 @@ namespace MidiExamples
                 Console.WriteLine("MIDI Examples:");
                 Console.WriteLine();
                 Console.WriteLine("--------------------------------------------------------------");
-                foreach (KeyValuePair<ConsoleKey, ExampleBase> example in examples)
+                foreach (var example in Examples)
                 {
                     Console.WriteLine("{0} : {1} ({2})",
                         example.Key.ToString().ToLower(),
@@ -64,16 +60,16 @@ namespace MidiExamples
                 Console.WriteLine("--------------------------------------------------------------");
                 Console.WriteLine();
                 Console.Write("Enter the letter for an example to run, or Escape to quit: ");
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                var keyInfo = Console.ReadKey();
                 if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     return;
                 }
-                if (examples.ContainsKey(keyInfo.Key))
+                if (Examples.ContainsKey(keyInfo.Key))
                 {
-                    ExampleBase example = examples[keyInfo.Key];
-                        Console.Clear();
-                        example.Run();
+                    var example = Examples[keyInfo.Key];
+                    Console.Clear();
+                    example.Run();
                 }
             }
         }

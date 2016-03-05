@@ -22,51 +22,31 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace MidiExamples
 {
     /// <summary>
-    /// Base class for examples that can be run by the MidiExamples program.
+    ///     Base class for examples that can be run by the MidiExamples program.
     /// </summary>
     public abstract class ExampleBase
     {
         /// <summary>
-        /// Protected constructor.
+        ///     Protected constructor.
         /// </summary>
-        /// <param name="name">The filename of the example.</param>
+        /// <param name="fileName">The filename of the example.</param>
         /// <param name="description">Short description of the example.</param>
         protected ExampleBase(string fileName, string description)
         {
-            this.fileName = fileName;
-            this.description = description;
+            FileName = fileName;
+            Description = description;
         }
 
-        public string FileName
-        {
-            get
-            {
-                return fileName;
-            }
-        }
+        public string FileName { get; }
 
-        public string Description
-        {
-            get
-            {
-                return description;
-            }
-        }
+        public string Description { get; }
 
         /// <summary>
-        /// Runs this example.
+        ///     Runs this example.
         /// </summary>
         public abstract void Run();
-
-        private string fileName;
-        private string description;
     }
 }

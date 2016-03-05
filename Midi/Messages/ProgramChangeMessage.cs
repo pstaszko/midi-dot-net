@@ -15,7 +15,7 @@ namespace Midi.Messages
         /// <param name="channel">Channel.</param>
         /// <param name="instrument">Instrument.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public ProgramChangeMessage(DeviceBase device, Channel channel, Instrument instrument,
+        public ProgramChangeMessage(IDeviceBase device, Channel channel, Instrument instrument,
             float time)
             : base(device, channel, time)
         {
@@ -33,7 +33,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendProgramChange(Channel, Instrument);
+            (Device as IOutputDevice)?.SendProgramChange(Channel, Instrument);
         }
 
         /// <summary>

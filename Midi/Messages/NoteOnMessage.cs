@@ -16,7 +16,7 @@ namespace Midi.Messages
         /// <param name="pitch">The pitch for this note message.</param>
         /// <param name="velocity">Velocity, 0..127.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public NoteOnMessage(DeviceBase device, Channel channel, Pitch pitch, int velocity,
+        public NoteOnMessage(IDeviceBase device, Channel channel, Pitch pitch, int velocity,
             float time)
             : base(device, channel, pitch, velocity, time)
         {

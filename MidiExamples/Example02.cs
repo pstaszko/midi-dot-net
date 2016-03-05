@@ -23,7 +23,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using Midi;
 using System.Threading;
 using Midi.Devices;
 using Midi.Enums;
@@ -33,28 +32,29 @@ using Midi.Messages;
 namespace MidiExamples
 {
     /// <summary>
-    /// Demonstrates simple single-threaded output.
+    ///     Demonstrates simple single-threaded output.
     /// </summary>
     /// <remarks>
-    /// This example uses the OutputDevice.Send* methods directly to generate output.  It uses
-    /// Thread.Sleep for timing, which isn't practical in real applications because it blocks
-    /// the main thread, forcing the user to sit and wait.  See Example03.cs for a more realistic
-    /// example using Clock for scheduling.
+    ///     This example uses the OutputDevice.Send* methods directly to generate output.  It uses
+    ///     Thread.Sleep for timing, which isn't practical in real applications because it blocks
+    ///     the main thread, forcing the user to sit and wait.  See Example03.cs for a more realistic
+    ///     example using Clock for scheduling.
     /// </remarks>
-    class Example02 : ExampleBase
+    internal class Example02 : ExampleBase
     {
         public Example02()
             : base("Example02.cs", "Simple MIDI output example.")
-        { }
-
-        void PlayChordRun(OutputDevice outputDevice, Chord chord, int millisecondsBetween)
         {
-            Pitch previousNote = (Pitch)(-1);
-            for (Pitch pitch = Pitch.A0; pitch < Pitch.C8; ++pitch)
+        }
+
+        private void PlayChordRun(IOutputDevice outputDevice, Chord chord, int millisecondsBetween)
+        {
+            var previousNote = (Pitch) (-1);
+            for (var pitch = Pitch.A0; pitch < Pitch.C8; ++pitch)
             {
                 if (chord.Contains(pitch))
                 {
-                    if (previousNote != (Pitch)(-1))
+                    if (previousNote != (Pitch) (-1))
                     {
                         outputDevice.SendNoteOff(Channel.Channel1, previousNote, 80);
                     }
@@ -63,7 +63,7 @@ namespace MidiExamples
                     previousNote = pitch;
                 }
             }
-            if (previousNote != (Pitch)(-1))
+            if (previousNote != (Pitch) (-1))
             {
                 outputDevice.SendNoteOff(Channel.Channel1, previousNote, 80);
             }
@@ -72,7 +72,7 @@ namespace MidiExamples
         public override void Run()
         {
             // Prompt user to choose an output device (or if there is only one, use that one).
-            OutputDevice outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
+            var outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
             if (outputDevice == null)
             {
                 Console.WriteLine("No output devices, so can't run this example.");
@@ -102,19 +102,19 @@ namespace MidiExamples
             outputDevice.SendNoteOff(Channel.Channel1, Pitch.G4, 80);
 
             // Now bend the pitches down.
-            for (int i = 0; i < 17; ++i)
+            for (var i = 0; i < 17; ++i)
             {
-                outputDevice.SendPitchBend(Channel.Channel1, 8192 - i * 450);
+                outputDevice.SendPitchBend(Channel.Channel1, 8192 - i*450);
                 Thread.Sleep(200);
             }
-            
+
             // Now release the sustain pedal, which should silence the notes, then center
             // the pitch bend again.
             outputDevice.SendControlChange(Channel.Channel1, Control.SustainPedal, 0);
             outputDevice.SendPitchBend(Channel.Channel1, 8192);
 
             Console.WriteLine("Playing the first two bars of Mary Had a Little Lamb...");
-            Clock clock = new Clock(120);
+            var clock = new Clock(120);
             clock.Schedule(new NoteOnMessage(outputDevice, Channel.Channel1, Pitch.E4, 80, 0));
             clock.Schedule(new NoteOffMessage(outputDevice, Channel.Channel1, Pitch.E4, 80, 1));
             clock.Schedule(new NoteOnMessage(outputDevice, Channel.Channel1, Pitch.D4, 80, 1));

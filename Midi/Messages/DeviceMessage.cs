@@ -11,7 +11,7 @@ namespace Midi.Messages
         /// <summary>
         ///     Protected constructor.
         /// </summary>
-        protected DeviceMessage(DeviceBase device, float time)
+        protected DeviceMessage(IDeviceBase device, float time)
             : base(time)
         {
             if (device == null)
@@ -24,6 +24,6 @@ namespace Midi.Messages
         /// <summary>
         ///     The device from which this message originated, or for which it is destined.
         /// </summary>
-        public DeviceBase Device { get; }
+        public IDeviceBase Device { get; }
     }
 }

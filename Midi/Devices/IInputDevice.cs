@@ -36,7 +36,7 @@ namespace Midi.Devices
     /// <threadsafety static="true" instance="true" />
     /// <seealso cref="Clock" />
     /// <seealso cref="InputDevice" />
-    public interface IInputDevice
+    public interface IInputDevice : IDeviceBase
     {
         /// <summary>
         ///     True if this device has been successfully opened.
@@ -47,11 +47,6 @@ namespace Midi.Devices
         ///     True if this device is receiving messages.
         /// </summary>
         bool IsReceiving { get; }
-
-        /// <summary>
-        ///     The name of this device.
-        /// </summary>
-        string Name { get; }
 
         /// <summary>
         ///     Event called when an input device receives a Note On message.

@@ -18,7 +18,7 @@ namespace Midi.Messages
         /// <param name="time">The timestamp for this message.</param>
         /// <param name="clock">The clock that should schedule the off message.</param>
         /// <param name="duration">Time delay between on message and off messasge.</param>
-        public NoteOnOffMessage(DeviceBase device, Channel channel, Pitch pitch,
+        public NoteOnOffMessage(IDeviceBase device, Channel channel, Pitch pitch,
             int velocity, float time, Clock clock, float duration)
             : base(device, channel, pitch, velocity, time)
         {
@@ -41,7 +41,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendNoteOn(Channel, Pitch, Velocity);
+            (Device as IOutputDevice)?.SendNoteOn(Channel, Pitch, Velocity);
             Clock.Schedule(new NoteOffMessage(Device, Channel, Pitch, Velocity, Time + Duration));
         }
 

@@ -23,8 +23,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using Midi;
-using System.Threading;
 using System.Collections.Generic;
 using Midi.Devices;
 using Midi.Enums;
@@ -32,208 +30,30 @@ using Midi.Instruments;
 using Midi.Messages;
 
 namespace MidiExamples
-{    
+{
     /// <summary>
-    /// Simple arpeggiator.
+    ///     Simple arpeggiator.
     /// </summary>
     /// <remarks>
-    /// This example demonstrates input, output and Clock-based scheduling.  As Note On and
-    /// Note Off events are received from the input device, the Arpeggiator class schedules
-    /// arpeggiated chords or scales based on the note played. 
+    ///     This example demonstrates input, output and Clock-based scheduling.  As Note On and
+    ///     Note Off events are received from the input device, the Arpeggiator class schedules
+    ///     arpeggiated chords or scales based on the note played.
     /// </remarks>
     public class Example06 : ExampleBase
     {
         public Example06()
             : base("Example06.cs", "Arpeggiator.")
-        { }
-
-        class Arpeggiator
         {
-            public Arpeggiator(InputDevice inputDevice, OutputDevice outputDevice, Clock clock)
-            {
-                this.inputDevice = inputDevice;
-                this.outputDevice = outputDevice;
-                this.clock = clock;
-                this.currentChordPattern = 0;
-                this.currentScalePattern = 0;
-                this.playingChords = false;
-                this.lastSequenceForPitch = new Dictionary<Pitch, List<Pitch>>();
-
-                if (inputDevice != null)
-                {
-                    inputDevice.NoteOn += new InputDevice.NoteOnHandler(this.NoteOn);
-                    inputDevice.NoteOff += new InputDevice.NoteOffHandler(this.NoteOff);
-                }
-            }
-
-            /// <summary>
-            /// String describing the arpeggiator's current configuration.
-            /// </summary>
-            public string Status
-            {
-                get
-                {
-                    lock (this)
-                    {
-                        if (playingChords)
-                        {
-                            return "Chord: " + Chord.Patterns[currentChordPattern].Name;
-                        }
-                        else
-                        {
-                            return "Scale: " + Scale.Patterns[currentScalePattern].Name;
-                        }
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Toggle between playing chords and playing scales.
-            /// </summary>
-            public void ToggleMode()
-            {
-                lock(this)
-                {
-                    playingChords = !playingChords;
-                }
-            }
-
-            /// <summary>
-            /// Changes the current chord or scale, whichever is the current mode.
-            /// </summary>
-            public void Change(int delta)
-            {
-                lock (this)
-                {
-                    if (playingChords)
-                    {
-                        currentChordPattern = currentChordPattern + delta;
-                        while (currentChordPattern < 0)
-                        {
-                            currentChordPattern += Chord.Patterns.Length;
-                        }
-                        while (currentChordPattern >= Chord.Patterns.Length)
-                        {
-                            currentChordPattern -= Chord.Patterns.Length;
-                        }
-                    }
-                    else
-                    {
-                        currentScalePattern = currentScalePattern + delta;
-                        while (currentScalePattern < 0)
-                        {
-                            currentScalePattern += Scale.Patterns.Length;
-                        }
-                        while (currentScalePattern >= Scale.Patterns.Length)
-                        {
-                            currentScalePattern -= Scale.Patterns.Length;
-                        }
-                    }
-                }
-            }
-
-            public void NoteOn(NoteOnMessage msg)
-            {
-                lock (this)
-                {
-                    List<Pitch> pitches = new List<Pitch>();
-                    if (playingChords)
-                    {
-                        Chord chord = new Chord(msg.Pitch.NotePreferringSharps(),
-                            Chord.Patterns[currentChordPattern], 0);
-                        Pitch p = msg.Pitch;
-                        for (int i = 0; i < chord.NoteSequence.Length; ++i)
-                        {
-                            p = chord.NoteSequence[i].PitchAtOrAbove(p);
-                            pitches.Add(p);
-                        }
-                    }
-                    else
-                    {
-                        Scale scale = new Scale(msg.Pitch.NotePreferringSharps(),
-                            Scale.Patterns[currentScalePattern]);
-                        Pitch p = msg.Pitch;
-                        for (int i = 0; i < scale.NoteSequence.Length; ++i)
-                        {
-                            p = scale.NoteSequence[i].PitchAtOrAbove(p);
-                            pitches.Add(p);
-                        }
-                        pitches.Add(msg.Pitch + 12);
-                    }
-                    lastSequenceForPitch[msg.Pitch] = pitches;
-                    for (int i = 1; i < pitches.Count; ++i)
-                    {
-                        clock.Schedule(new NoteOnMessage(outputDevice, msg.Channel,
-                            pitches[i], msg.Velocity, msg.Time + i));
-                    }
-                }
-            }
-
-            public void NoteOff(NoteOffMessage msg)
-            {
-                if (!lastSequenceForPitch.ContainsKey(msg.Pitch))
-                {
-                    return;
-                }
-                List<Pitch> pitches = lastSequenceForPitch[msg.Pitch];
-                lastSequenceForPitch.Remove(msg.Pitch);
-                for (int i = 1; i < pitches.Count; ++i)
-                {
-                    clock.Schedule(new NoteOffMessage(outputDevice, msg.Channel,
-                        pitches[i], msg.Velocity, msg.Time + i));
-                }
-            }
-
-            private InputDevice inputDevice;
-            private OutputDevice outputDevice;
-            private Clock clock;
-            private int currentChordPattern;
-            private int currentScalePattern;
-            private bool playingChords;
-            private Dictionary<Pitch, List<Pitch>> lastSequenceForPitch;
-        }
-
-        class Drummer
-        {
-            public Drummer(Clock clock, OutputDevice outputDevice, int beatsPerMeasure)
-            {
-                this.clock = clock;
-                this.outputDevice = outputDevice;
-                this.beatsPerMeasure = beatsPerMeasure;
-                this.messagesForOneMeasure = new List<Message>();
-                for (int i = 0; i < beatsPerMeasure; ++i)
-                {
-                    Percussion percussion = i == 0 ? Percussion.PedalHiHat : Percussion.MidTom1;
-                    int velocity = i == 0 ? 100 : 40;
-                    messagesForOneMeasure.Add(new PercussionMessage(outputDevice, percussion,
-                        velocity, i));
-                }
-                messagesForOneMeasure.Add(new CallbackMessage(
-                    new CallbackMessage.CallbackType(CallbackHandler), 0));
-                clock.Schedule(messagesForOneMeasure, 0);
-            }
-            
-            private void CallbackHandler(float time)
-            {
-                // Round up to the next measure boundary.
-                float timeOfNextMeasure = time + beatsPerMeasure;
-                clock.Schedule(messagesForOneMeasure, timeOfNextMeasure);
-            }
-
-            private Clock clock;
-            private OutputDevice outputDevice;
-            private int beatsPerMeasure;
-            private List<Message> messagesForOneMeasure;
         }
 
         public override void Run()
         {
             // Create a clock running at the specified beats per minute.
-            int beatsPerMinute = 180;
-            Clock clock = new Clock(beatsPerMinute);
-            
+            var beatsPerMinute = 180;
+            var clock = new Clock(beatsPerMinute);
+
             // Prompt user to choose an output device (or if there is only one, use that one.
-            OutputDevice outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
+            var outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
             if (outputDevice == null)
             {
                 Console.WriteLine("No output devices, so can't run this example.");
@@ -243,22 +63,16 @@ namespace MidiExamples
             outputDevice.Open();
 
             // Prompt user to choose an input device (or if there is only one, use that one).
-            InputDevice inputDevice = ExampleUtil.ChooseInputDeviceFromConsole();
-            if (inputDevice != null)
-            {
-                inputDevice.Open();
-            }
+            var inputDevice = ExampleUtil.ChooseInputDeviceFromConsole();
+            inputDevice?.Open();
 
-            Arpeggiator arpeggiator = new Arpeggiator(inputDevice, outputDevice, clock);
-            Drummer drummer = new Drummer(clock, outputDevice, 4);
+            var arpeggiator = new Arpeggiator(inputDevice, outputDevice, clock);
+            var drummer = new Drummer(clock, outputDevice, 4);
 
             clock.Start();
-            if (inputDevice != null)
-            {
-                inputDevice.StartReceiving(clock);
-            }
+            inputDevice?.StartReceiving(clock);
 
-            bool done = false;
+            var done = false;
             while (!done)
             {
                 Console.Clear();
@@ -271,7 +85,7 @@ namespace MidiExamples
                 Console.WriteLine("Right: Next Chord or Scale");
                 Console.WriteLine("Space = Toggle Play");
                 Console.WriteLine("Enter = Toggle Scales/Chords");
-                ConsoleKey key = Console.ReadKey(true).Key;
+                var key = Console.ReadKey(true).Key;
                 Pitch pitch;
                 if (key == ConsoleKey.Escape)
                 {
@@ -298,19 +112,13 @@ namespace MidiExamples
                     if (clock.IsRunning)
                     {
                         clock.Stop();
-                        if (inputDevice != null)
-                        {
-                            inputDevice.StopReceiving();
-                        }
+                        inputDevice?.StopReceiving();
                         outputDevice.SilenceAllNotes();
                     }
                     else
                     {
                         clock.Start();
-                        if (inputDevice != null)
-                        {
-                            inputDevice.StartReceiving(clock);
-                        }
+                        inputDevice?.StartReceiving(clock);
                     }
                 }
                 else if (key == ConsoleKey.Enter)
@@ -321,18 +129,15 @@ namespace MidiExamples
                 {
                     // We've hit a QUERTY key which is meant to simulate a MIDI note, so
                     // send the Note On to the output device and tell the arpeggiator.
-                    NoteOnMessage noteOn = new NoteOnMessage(outputDevice, 0, pitch, 100,
+                    var noteOn = new NoteOnMessage(outputDevice, 0, pitch, 100,
                         clock.Time);
                     clock.Schedule(noteOn);
                     arpeggiator.NoteOn(noteOn);
                     // We don't get key release events for the console, so schedule a
                     // simulated Note Off one beat from now.
-                    NoteOffMessage noteOff = new NoteOffMessage(outputDevice, 0, pitch, 100,
+                    var noteOff = new NoteOffMessage(outputDevice, 0, pitch, 100,
                         clock.Time + 1);
-                    CallbackMessage.CallbackType noteOffCallback = beatTime =>
-                    {
-                        arpeggiator.NoteOff(noteOff);
-                    };
+                    CallbackMessage.CallbackType noteOffCallback = beatTime => { arpeggiator.NoteOff(noteOff); };
                     clock.Schedule(new CallbackMessage(beatTime => arpeggiator.NoteOff(noteOff),
                         noteOff.Time));
                 }
@@ -341,10 +146,7 @@ namespace MidiExamples
             if (clock.IsRunning)
             {
                 clock.Stop();
-                if (inputDevice != null)
-                {
-                    inputDevice.StopReceiving();
-                }
+                inputDevice?.StopReceiving();
                 outputDevice.SilenceAllNotes();
             }
 
@@ -356,6 +158,182 @@ namespace MidiExamples
             }
 
             // All done.
+        }
+
+        private class Arpeggiator
+        {
+            private readonly Clock _clock;
+            private readonly IOutputDevice _outputDevice;
+            private readonly Dictionary<Pitch, List<Pitch>> _lastSequenceForPitch;
+            private int _currentChordPattern;
+            private int _currentScalePattern;
+            private IInputDevice _inputDevice;
+            private bool _playingChords;
+
+            public Arpeggiator(IInputDevice inputDevice, IOutputDevice outputDevice, Clock clock)
+            {
+                _inputDevice = inputDevice;
+                _outputDevice = outputDevice;
+                _clock = clock;
+                _currentChordPattern = 0;
+                _currentScalePattern = 0;
+                _playingChords = false;
+                _lastSequenceForPitch = new Dictionary<Pitch, List<Pitch>>();
+
+                if (inputDevice != null)
+                {
+                    inputDevice.NoteOn += NoteOn;
+                    inputDevice.NoteOff += NoteOff;
+                }
+            }
+
+            /// <summary>
+            ///     String describing the arpeggiator's current configuration.
+            /// </summary>
+            public string Status
+            {
+                get
+                {
+                    lock (this)
+                    {
+                        if (_playingChords)
+                        {
+                            return "Chord: " + Chord.Patterns[_currentChordPattern].Name;
+                        }
+                        return "Scale: " + Scale.Patterns[_currentScalePattern].Name;
+                    }
+                }
+            }
+
+            /// <summary>
+            ///     Toggle between playing chords and playing scales.
+            /// </summary>
+            public void ToggleMode()
+            {
+                lock (this)
+                {
+                    _playingChords = !_playingChords;
+                }
+            }
+
+            /// <summary>
+            ///     Changes the current chord or scale, whichever is the current mode.
+            /// </summary>
+            public void Change(int delta)
+            {
+                lock (this)
+                {
+                    if (_playingChords)
+                    {
+                        _currentChordPattern = _currentChordPattern + delta;
+                        while (_currentChordPattern < 0)
+                        {
+                            _currentChordPattern += Chord.Patterns.Length;
+                        }
+                        while (_currentChordPattern >= Chord.Patterns.Length)
+                        {
+                            _currentChordPattern -= Chord.Patterns.Length;
+                        }
+                    }
+                    else
+                    {
+                        _currentScalePattern = _currentScalePattern + delta;
+                        while (_currentScalePattern < 0)
+                        {
+                            _currentScalePattern += Scale.Patterns.Length;
+                        }
+                        while (_currentScalePattern >= Scale.Patterns.Length)
+                        {
+                            _currentScalePattern -= Scale.Patterns.Length;
+                        }
+                    }
+                }
+            }
+
+            public void NoteOn(NoteOnMessage msg)
+            {
+                lock (this)
+                {
+                    var pitches = new List<Pitch>();
+                    if (_playingChords)
+                    {
+                        var chord = new Chord(msg.Pitch.NotePreferringSharps(),
+                            Chord.Patterns[_currentChordPattern], 0);
+                        var p = msg.Pitch;
+                        for (var i = 0; i < chord.NoteSequence.Length; ++i)
+                        {
+                            p = chord.NoteSequence[i].PitchAtOrAbove(p);
+                            pitches.Add(p);
+                        }
+                    }
+                    else
+                    {
+                        var scale = new Scale(msg.Pitch.NotePreferringSharps(),
+                            Scale.Patterns[_currentScalePattern]);
+                        var p = msg.Pitch;
+                        for (var i = 0; i < scale.NoteSequence.Length; ++i)
+                        {
+                            p = scale.NoteSequence[i].PitchAtOrAbove(p);
+                            pitches.Add(p);
+                        }
+                        pitches.Add(msg.Pitch + 12);
+                    }
+                    _lastSequenceForPitch[msg.Pitch] = pitches;
+                    for (var i = 1; i < pitches.Count; ++i)
+                    {
+                        _clock.Schedule(new NoteOnMessage(_outputDevice, msg.Channel,
+                            pitches[i], msg.Velocity, msg.Time + i));
+                    }
+                }
+            }
+
+            public void NoteOff(NoteOffMessage msg)
+            {
+                if (!_lastSequenceForPitch.ContainsKey(msg.Pitch))
+                {
+                    return;
+                }
+                var pitches = _lastSequenceForPitch[msg.Pitch];
+                _lastSequenceForPitch.Remove(msg.Pitch);
+                for (var i = 1; i < pitches.Count; ++i)
+                {
+                    _clock.Schedule(new NoteOffMessage(_outputDevice, msg.Channel,
+                        pitches[i], msg.Velocity, msg.Time + i));
+                }
+            }
+        }
+
+        private class Drummer
+        {
+            private readonly int _beatsPerMeasure;
+            private readonly Clock _clock;
+            private readonly List<Message> _messagesForOneMeasure;
+            private IOutputDevice _outputDevice;
+
+            public Drummer(Clock clock, IOutputDevice outputDevice, int beatsPerMeasure)
+            {
+                _clock = clock;
+                _outputDevice = outputDevice;
+                _beatsPerMeasure = beatsPerMeasure;
+                _messagesForOneMeasure = new List<Message>();
+                for (var i = 0; i < beatsPerMeasure; ++i)
+                {
+                    var percussion = i == 0 ? Percussion.PedalHiHat : Percussion.MidTom1;
+                    var velocity = i == 0 ? 100 : 40;
+                    _messagesForOneMeasure.Add(new PercussionMessage(outputDevice, percussion,
+                        velocity, i));
+                }
+                _messagesForOneMeasure.Add(new CallbackMessage(
+                    CallbackHandler, 0));
+                clock.Schedule(_messagesForOneMeasure, 0);
+            }
+
+            private void CallbackHandler(float time)
+            {
+                // Round up to the next measure boundary.
+                var timeOfNextMeasure = time + _beatsPerMeasure;
+                _clock.Schedule(_messagesForOneMeasure, timeOfNextMeasure);
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Midi.Messages
         /// <param name="control">Control, 0..119</param>
         /// <param name="value">Value, 0..127.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public ControlChangeMessage(DeviceBase device, Channel channel, Control control, int value,
+        public ControlChangeMessage(IDeviceBase device, Channel channel, Control control, int value,
             float time)
             : base(device, channel, time)
         {
@@ -45,7 +45,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendControlChange(Channel, Control, Value);
+            (Device as IOutputDevice)?.SendControlChange(Channel, Control, Value);
         }
 
         /// <summary>

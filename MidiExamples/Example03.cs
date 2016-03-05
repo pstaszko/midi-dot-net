@@ -23,41 +23,40 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 using System;
-using Midi;
-using System.Threading;
 using System.Collections.Generic;
-using Midi.Devices;
 using Midi.Enums;
 
 namespace MidiExamples
 {
     /// <summary>
-    /// Simple drum machine.
+    ///     Simple drum machine.
     /// </summary>
     /// <remarks>
-    /// This example creates a simple drum machine controlled by the QWERTY keyboard and using
-    /// OutputDevice.SendPercussion().
+    ///     This example creates a simple drum machine controlled by the QWERTY keyboard and using
+    ///     OutputDevice.SendPercussion().
     /// </remarks>
-    class Example03 : ExampleBase
+    internal class Example03 : ExampleBase
     {
-        public Example03()
-            : base("Example03.cs", "Alphabetic keys play MIDI percussion sounds.")
-        { }
-
         // Defines QUERTY order so that the percussion sounds can map to the keyboard in
         // that order.
-        private static ConsoleKey[] QwertyOrder  = new ConsoleKey[] {
-            ConsoleKey.Q, ConsoleKey.W, ConsoleKey.E, ConsoleKey.R, ConsoleKey.T, ConsoleKey.Y, 
-            ConsoleKey.U, ConsoleKey.I, ConsoleKey.O, ConsoleKey.P, ConsoleKey.A, ConsoleKey.S, 
-            ConsoleKey.D, ConsoleKey.F, ConsoleKey.G, ConsoleKey.H, ConsoleKey.J, ConsoleKey.K, 
-            ConsoleKey.L, ConsoleKey.Z, ConsoleKey.X, ConsoleKey.C, ConsoleKey.V, ConsoleKey.B, 
-            ConsoleKey.N, ConsoleKey.M 
+        private static readonly ConsoleKey[] QwertyOrder =
+        {
+            ConsoleKey.Q, ConsoleKey.W, ConsoleKey.E, ConsoleKey.R, ConsoleKey.T, ConsoleKey.Y,
+            ConsoleKey.U, ConsoleKey.I, ConsoleKey.O, ConsoleKey.P, ConsoleKey.A, ConsoleKey.S,
+            ConsoleKey.D, ConsoleKey.F, ConsoleKey.G, ConsoleKey.H, ConsoleKey.J, ConsoleKey.K,
+            ConsoleKey.L, ConsoleKey.Z, ConsoleKey.X, ConsoleKey.C, ConsoleKey.V, ConsoleKey.B,
+            ConsoleKey.N, ConsoleKey.M
         };
+
+        public Example03()
+            : base("Example03.cs", "Alphabetic keys play MIDI percussion sounds.")
+        {
+        }
 
         public override void Run()
         {
             // Prompt the user to choose an output device (or if there is only one, use that one).
-            OutputDevice outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
+            var outputDevice = ExampleUtil.ChooseOutputDeviceFromConsole();
             if (outputDevice == null)
             {
                 Console.WriteLine("No output devices, so can't run this example.");
@@ -68,11 +67,11 @@ namespace MidiExamples
 
             // Generate two maps from console keys to percussion sounds: one for when alphabetic
             // keys are pressed and one for when they're pressed with shift.
-            Dictionary<ConsoleKey, Percussion> unshiftedKeys =
+            var unshiftedKeys =
                 new Dictionary<ConsoleKey, Percussion>();
-            Dictionary<ConsoleKey, Percussion> shiftedKeys =
+            var shiftedKeys =
                 new Dictionary<ConsoleKey, Percussion>();
-            for (int i = 0; i < 26; ++i)
+            for (var i = 0; i < 26; ++i)
             {
                 unshiftedKeys[QwertyOrder[i]] = Percussion.BassDrum1 + i;
                 if (i < 20)
@@ -81,24 +80,24 @@ namespace MidiExamples
                 }
             }
 
-            Console.WriteLine("Press alphabetic keys (with and without SHIFT) to play MIDI "+
-                "percussion sounds.");
+            Console.WriteLine("Press alphabetic keys (with and without SHIFT) to play MIDI " +
+                              "percussion sounds.");
             Console.WriteLine("Press Escape when finished.");
             Console.WriteLine();
 
             while (true)
             {
-                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                var keyInfo = Console.ReadKey(true);
                 if (keyInfo.Key == ConsoleKey.Escape)
                 {
                     break;
                 }
-                else if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
+                if ((keyInfo.Modifiers & ConsoleModifiers.Shift) != 0)
                 {
                     if (shiftedKeys.ContainsKey(keyInfo.Key))
                     {
-                        Percussion note = shiftedKeys[keyInfo.Key];
-                        Console.Write("\rNote {0} ({1})         ", (int)note, note.Name());
+                        var note = shiftedKeys[keyInfo.Key];
+                        Console.Write("\rNote {0} ({1})         ", (int) note, note.Name());
                         outputDevice.SendPercussion(note, 90);
                     }
                 }
@@ -106,8 +105,8 @@ namespace MidiExamples
                 {
                     if (unshiftedKeys.ContainsKey(keyInfo.Key))
                     {
-                        Percussion note = unshiftedKeys[keyInfo.Key];
-                        Console.Write("\rNote {0} ({1})         ", (int)note, note.Name());
+                        var note = unshiftedKeys[keyInfo.Key];
+                        Console.Write("\rNote {0} ({1})         ", (int) note, note.Name());
                         outputDevice.SendPercussion(note, 90);
                     }
                 }

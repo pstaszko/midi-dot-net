@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Midi.Instruments
 {
@@ -69,7 +70,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator ==(ScalePattern a, ScalePattern b)
         {
-            return a != null && (ReferenceEquals(a, b) || a.Equals(b));
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object)b);
         }
 
         /// <summary>
@@ -104,7 +105,8 @@ namespace Midi.Instruments
 
         protected bool Equals(ScalePattern other)
         {
-            return string.Equals(Name, other.Name) && Equals(Ascent, other.Ascent);
+            return string.Equals(Name, other.Name) 
+                && Ascent.SequenceEqual(other.Ascent);
         }
 
         /// <summary>Returns true if ascent is valid.</summary>

@@ -31,17 +31,12 @@ namespace Midi.Devices
     /// <threadsafety static="true" instance="true" />
     /// <seealso cref="Clock" />
     /// <seealso cref="InputDevice" />
-    public interface IOutputDevice
+    public interface IOutputDevice : IDeviceBase
     {
         /// <summary>
         ///     True if this device is open.
         /// </summary>
         bool IsOpen { get; }
-
-        /// <summary>
-        ///     The name of this device.
-        /// </summary>
-        string Name { get; }
 
         /// <summary>
         ///     Opens this output device.

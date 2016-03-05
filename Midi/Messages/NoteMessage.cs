@@ -12,7 +12,7 @@ namespace Midi.Messages
         /// <summary>
         ///     Protected constructor.
         /// </summary>
-        protected NoteMessage(DeviceBase device, Channel channel, Pitch pitch, int velocity,
+        protected NoteMessage(IDeviceBase device, Channel channel, Pitch pitch, int velocity,
             float time)
             : base(device, channel, time)
         {

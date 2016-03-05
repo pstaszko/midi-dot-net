@@ -34,7 +34,7 @@ namespace Midi.Messages
         /// <summary>
         ///     Protected constructor.
         /// </summary>
-        public SysExMessage(DeviceBase device, byte[] data, float time)
+        public SysExMessage(IDeviceBase device, byte[] data, float time)
             : base(device, time)
         {
             Data = data;
@@ -50,7 +50,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendSysEx(Data);
+            (Device as IOutputDevice)?.SendSysEx(Data);
         }
 
         /// <summary>

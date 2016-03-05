@@ -16,7 +16,7 @@ namespace Midi.Messages
         /// <param name="pitch">The pitch for this note message.</param>
         /// <param name="velocity">Velocity, 0..127.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public NoteOffMessage(DeviceBase device, Channel channel, Pitch pitch, int velocity,
+        public NoteOffMessage(IDeviceBase device, Channel channel, Pitch pitch, int velocity,
             float time)
             : base(device, channel, pitch, velocity, time)
         {
@@ -27,7 +27,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendNoteOff(Channel, Pitch, Velocity);
+            (Device as IOutputDevice)?.SendNoteOff(Channel, Pitch, Velocity);
         }
 
         /// <summary>

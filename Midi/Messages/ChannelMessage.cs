@@ -11,7 +11,7 @@ namespace Midi.Messages
         /// <summary>
         ///     Protected constructor.
         /// </summary>
-        protected ChannelMessage(DeviceBase device, Channel channel, float time)
+        protected ChannelMessage(IDeviceBase device, Channel channel, float time)
             : base(device, time)
         {
             channel.Validate();

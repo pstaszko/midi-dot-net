@@ -21,7 +21,7 @@ namespace Midi.Messages
         /// <param name="percussion">Percussion.</param>
         /// <param name="velocity">Velocity, 0..127.</param>
         /// <param name="time">The timestamp for this message.</param>
-        public PercussionMessage(DeviceBase device, Percussion percussion, int velocity,
+        public PercussionMessage(IDeviceBase device, Percussion percussion, int velocity,
             float time)
             : base(device, time)
         {
@@ -49,7 +49,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendNoteOn(Channel.Channel10, (Pitch) Percussion, Velocity);
+            (Device as IOutputDevice)?.SendNoteOn(Channel.Channel10, (Pitch) Percussion, Velocity);
         }
 
         /// <summary>
