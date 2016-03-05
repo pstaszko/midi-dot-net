@@ -23,7 +23,7 @@ namespace Midi.Devices
 
             try
             {
-                Marshal.PtrToStructure<MIDIHDR>(newPtr);
+                Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
                 return true;
             }
             catch (Exception)
