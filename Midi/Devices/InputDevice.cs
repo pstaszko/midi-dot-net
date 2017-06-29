@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using micdah.LrControl;
 using Midi.Common;
 using Midi.Enums;
 using Midi.Messages;
@@ -124,8 +123,7 @@ namespace Midi.Devices
             lock (this)
             {
                 CheckNotOpen();
-                CheckReturnCode(Win32API.midiInOpen(out _handle, _deviceId,
-                    _inputCallbackDelegate, (UIntPtr) 0));
+                CheckReturnCode(Win32API.midiInOpen(out _handle, _deviceId, _inputCallbackDelegate, (UIntPtr) 0));
                 _isOpen = true;
             }
         }

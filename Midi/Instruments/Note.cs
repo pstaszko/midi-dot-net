@@ -45,19 +45,19 @@ namespace Midi.Instruments
     public struct Note
     {
         /// <summary>Double-flat accidental value.</summary>
-        public static int DoubleFlat = -2;
+        public static readonly int DoubleFlat = -2;
 
         /// <summary>Flat accidental value.</summary>
-        public static int Flat = -1;
+        public static readonly int Flat = -1;
 
         /// <summary>Natural accidental value.</summary>
-        public static int Natural = 0;
+        public static readonly int Natural = 0;
 
         /// <summary>Sharp accidental value.</summary>
-        public static int Sharp = 1;
+        public static readonly int Sharp = 1;
 
         /// <summary>Double-sharp accidental value.</summary>
-        public static int DoubleSharp = 2;
+        public static readonly int DoubleSharp = 2;
 
         /// <summary>
         ///     Constructs a note from a letter.

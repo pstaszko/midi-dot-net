@@ -1,4 +1,4 @@
-namespace micdah.LrControl
+namespace Midi.Common
 {
     internal struct Int14
     {
@@ -19,10 +19,7 @@ namespace micdah.LrControl
 
         public int Value
         {
-            get
-            {
-                return MSB << 7 | LSB;
-            }
+            get => MSB << 7 | LSB;
             set
             {
                 MSB = value >> 7;

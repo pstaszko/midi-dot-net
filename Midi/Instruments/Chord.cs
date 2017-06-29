@@ -49,37 +49,37 @@ namespace Midi.Instruments
         /// <summary>
         ///     Pattern for Major chords.
         /// </summary>
-        public static ChordPattern Major =
+        public static readonly ChordPattern Major =
             new ChordPattern("Major", "", new[] {0, 4, 7}, new[] {0, 2, 4});
 
         /// <summary>
         ///     Pattern for Minor chords.
         /// </summary>
-        public static ChordPattern Minor =
+        public static readonly ChordPattern Minor =
             new ChordPattern("Minor", "m", new[] {0, 3, 7}, new[] {0, 2, 4});
 
         /// <summary>
         ///     Pattern for Seventh chords.
         /// </summary>
-        public static ChordPattern Seventh =
+        public static readonly ChordPattern Seventh =
             new ChordPattern("Seventh", "7", new[] {0, 4, 7, 10}, new[] {0, 2, 4, 6});
 
         /// <summary>
         ///     Pattern for Augmented chords.
         /// </summary>
-        public static ChordPattern Augmented =
+        public static readonly ChordPattern Augmented =
             new ChordPattern("Augmented", "aug", new[] {0, 4, 8}, new[] {0, 2, 4});
 
         /// <summary>
         ///     Pattern for Diminished chords.
         /// </summary>
-        public static ChordPattern Diminished =
+        public static readonly ChordPattern Diminished =
             new ChordPattern("Diminished", "dim", new[] {0, 3, 6}, new[] {0, 2, 4});
 
         /// <summary>
         ///     Array of all the built-in chord patterns.
         /// </summary>
-        public static ChordPattern[] Patterns =
+        public static readonly ChordPattern[] Patterns =
         {
             Major,
             Minor,
@@ -320,7 +320,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator ==(Chord a, Chord b)
         {
-            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object)b);
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals(b);
         }
 
         /// <summary>

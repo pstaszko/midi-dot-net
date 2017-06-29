@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 
 namespace Midi.Instruments
 {
@@ -146,7 +145,7 @@ namespace Midi.Instruments
             }
         }
 
-        protected bool Equals(ChordPattern other)
+        private bool Equals(ChordPattern other)
         {
             return string.Equals(Name, other.Name)
                    && string.Equals(Abbreviation, other.Abbreviation)

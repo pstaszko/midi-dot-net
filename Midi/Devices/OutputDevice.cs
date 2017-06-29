@@ -25,7 +25,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using micdah.LrControl;
+using Midi.Common;
 using Midi.Enums;
 using Midi.Win32;
 

@@ -82,10 +82,10 @@ namespace Midi.Devices
             }
         }
 
-        private static InputDevice[] EnumerateInputDevices()
+        private static IInputDevice[] EnumerateInputDevices()
         {
             var inDevs = Win32API.midiInGetNumDevs();
-            var result = new InputDevice[inDevs];
+            var result = new IInputDevice[inDevs];
             for (uint deviceId = 0; deviceId < inDevs; deviceId++)
             {
                 MIDIINCAPS caps;
@@ -95,10 +95,10 @@ namespace Midi.Devices
             return result;
         }
 
-        private static OutputDevice[] EnumerateOutputDevices()
+        private static IOutputDevice[] EnumerateOutputDevices()
         {
             var outDevs = Win32API.midiOutGetNumDevs();
-            var result = new OutputDevice[outDevs];
+            var result = new IOutputDevice[outDevs];
             for (uint deviceId = 0; deviceId < outDevs; deviceId++)
             {
                 MidiOutCaps caps;
