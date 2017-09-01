@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <PackageId>midi-dot-net2</PackageId>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.0.1</PackageVersion>
     <Authors>Tom Lokovic 2009, Michael Dahl 2017</Authors>
     <Description>This is a derived work of the midi-dot-net created by Tom Lokovic in 2009, with the additions of NRPM support and SysEx messages</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -12,9 +12,6 @@
     <PackageTags>midi nrpn sysex</PackageTags>
     <PackageProjectUrl>https://github.com/micdah/midi-dot-net</PackageProjectUrl>
     <RepositoryUrl>https://github.com/micdah/midi-dot-net</RepositoryUrl>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <Version>2.0.0</Version>
   </PropertyGroup>
 
 </Project>
