@@ -38,6 +38,7 @@ namespace Midi.Devices
     /// <seealso cref="InputDevice" />
     public interface IInputDevice : IDeviceBase
     {
+        int Id { get; set; }
         /// <summary>
         ///     True if this device has been successfully opened.
         /// </summary>

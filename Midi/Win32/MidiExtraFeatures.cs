@@ -5,7 +5,7 @@ namespace Midi.Win32
     /// <summary>
     ///     Flags for dwSupport field of MIDIOUTCAPS structure.
     /// </summary>
-    internal enum MidiExtraFeatures : uint
+    public enum MidiExtraFeatures : uint
     {
         MIDICAPS_VOLUME = 0x0001,
         MIDICAPS_LRVOLUME = 0x0002,

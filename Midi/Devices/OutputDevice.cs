@@ -38,9 +38,10 @@ namespace Midi.Devices
 
         // The fields initialized in the constructor never change after construction,
         // so they don't need to be guarded by a lock.
-        private readonly UIntPtr _deviceId;
+        public readonly UIntPtr _deviceId;
+        public readonly ushort _pid;
         // ReSharper disable once NotAccessedField.Local
-        private MidiOutCaps _caps;
+        public MidiOutCaps _caps;
         private HMIDIOUT _handle;
         private bool _isOpen;
 
@@ -52,6 +53,7 @@ namespace Midi.Devices
         internal OutputDevice(UIntPtr deviceId, MidiOutCaps caps)
             : base(caps.szPname)
         {
+            //_pid = caps.wPid;
             _deviceId = deviceId;
             _caps = caps;
             _isOpen = false;
@@ -67,8 +69,10 @@ namespace Midi.Devices
                 }
             }
         }
-        
-        public void Open()
+
+		public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+		public void Open()
         {
             lock (this)
             {

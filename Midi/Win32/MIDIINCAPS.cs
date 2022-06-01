@@ -9,7 +9,7 @@ namespace Midi.Win32
     /// </summary>
     /// Win32 docs: http://msdn.microsoft.com/en-us/library/ms711596(VS.85).aspx
     [StructLayout(LayoutKind.Sequential)]
-    internal struct MIDIINCAPS
+    public struct MIDIINCAPS
     {
         public ushort wMid;
         public ushort wPid;

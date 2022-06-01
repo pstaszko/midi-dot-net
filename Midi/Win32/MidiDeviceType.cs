@@ -5,7 +5,7 @@ namespace Midi.Win32
     /// <summary>
     ///     Values for wTechnology field of MIDIOUTCAPS structure.
     /// </summary>
-    internal enum MidiDeviceType : ushort
+    public enum MidiDeviceType : ushort
     {
         MOD_MIDIPORT = 1,
         MOD_SYNTH = 2,

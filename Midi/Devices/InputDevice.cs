@@ -38,12 +38,12 @@ namespace Midi.Devices
         // Thread-local, set to true when called by an input handler, false in all other threads.
         [ThreadStatic] private static bool _isInsideInputHandler;
 
-        private readonly UIntPtr _deviceId;
+        public readonly UIntPtr _deviceId;
         private readonly Win32API.MidiInProc _inputCallbackDelegate;
         private readonly List<IntPtr> _longMsgBuffers = new List<IntPtr>();
         private readonly NrpnWatcher _nrpnWatcher;
         // ReSharper disable once NotAccessedField.Local
-        private MIDIINCAPS _caps;
+        public MIDIINCAPS _caps;
         private Clock _clock;
         private HMIDIIN _handle;
         private bool _isClosing;
@@ -95,8 +95,9 @@ namespace Midi.Devices
                 }
             }
         }
+		public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public event NoteOnHandler NoteOn;
+		public event NoteOnHandler NoteOn;
         public event NoteOffHandler NoteOff;
         public event ControlChangeHandler ControlChange;
         public event ProgramChangeHandler ProgramChange;
