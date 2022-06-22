@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2009, Tom Lokovic
+// Copyright (c) 2009, Tom Lokovic
 // All rights reserved.
 // 
 // Redistribution and use in source and binary forms, with or without
@@ -59,5 +59,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.1.5.0")]
+[assembly: AssemblyFileVersion("1.1.5.0")]
