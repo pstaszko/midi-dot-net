@@ -133,7 +133,7 @@ namespace Midi.Enums
         /// <param name="channel">The channel to test.</param>
         public static bool IsValid(this Channel channel)
         {
-            return (int) channel >= 0 && (int) channel < 16;
+            return (int)channel >= 0 && (int)channel < 16;
         }
 
         /// <summary>
@@ -143,8 +143,7 @@ namespace Midi.Enums
         /// <exception cref="ArgumentOutOfRangeException">The channel is out-of-range.</exception>
         public static void Validate(this Channel channel)
         {
-            if (!channel.IsValid())
-            {
+            if (!channel.IsValid()) {
                 throw new ArgumentOutOfRangeException(nameof(channel));
             }
         }
@@ -157,7 +156,7 @@ namespace Midi.Enums
         public static string Name(this Channel channel)
         {
             channel.Validate();
-            return ChannelNames[(int) channel];
+            return ChannelNames[(int)channel];
         }
     }
 }

@@ -140,14 +140,13 @@ namespace Midi.Devices
         /// <exception cref="ArgumentOutOfRangeException">beatsPerMinute is non-positive</exception>
         public Clock(float beatsPerMinute)
         {
-            if (beatsPerMinute <= 0)
-            {
+            if (beatsPerMinute <= 0) {
                 throw new ArgumentOutOfRangeException(nameof(beatsPerMinute));
             }
 
             _timingLock = new object();
             _beatsPerMinute = beatsPerMinute;
-            _millisecondsPerBeat = 60000f/beatsPerMinute;
+            _millisecondsPerBeat = 60000f / beatsPerMinute;
             _millisecondFudge = 0;
             _stopwatch = new Stopwatch();
 
@@ -182,15 +181,12 @@ namespace Midi.Devices
         /// </remarks>
         public float Time
         {
-            get
-            {
-                if (_isSchedulerThread)
-                {
+            get {
+                if (_isSchedulerThread) {
                     return _threadProcessingTime;
                 }
-                lock (_timingLock)
-                {
-                    return (_stopwatch.ElapsedMilliseconds + _millisecondFudge)/_millisecondsPerBeat;
+                lock (_timingLock) {
+                    return (_stopwatch.ElapsedMilliseconds + _millisecondFudge) / _millisecondsPerBeat;
                 }
             }
         }
@@ -206,23 +202,19 @@ namespace Midi.Devices
         /// </remarks>
         public float BeatsPerMinute
         {
-            get
-            {
-                lock (_timingLock)
-                {
+            get {
+                lock (_timingLock) {
                     return _beatsPerMinute;
                 }
             }
-            set
-            {
-                lock (_timingLock)
-                {
+            set {
+                lock (_timingLock) {
                     var newBeatsPerMinute = value;
-                    var newMillisecondsPerBeat = 60000f/newBeatsPerMinute;
+                    var newMillisecondsPerBeat = 60000f / newBeatsPerMinute;
                     var currentMillis = _stopwatch.ElapsedMilliseconds;
                     var currentFudgedMillis = currentMillis + _millisecondFudge;
-                    var beatTime = currentFudgedMillis/_millisecondsPerBeat;
-                    var newFudgedMillis = (long) (beatTime*newMillisecondsPerBeat);
+                    var beatTime = currentFudgedMillis / _millisecondsPerBeat;
+                    var newFudgedMillis = (long)(beatTime * newMillisecondsPerBeat);
                     var newMillisecondFudge = newFudgedMillis - currentMillis;
                     _beatsPerMinute = newBeatsPerMinute;
                     _millisecondsPerBeat = newMillisecondsPerBeat;
@@ -230,8 +222,7 @@ namespace Midi.Devices
                 }
                 // Pulse the threadlock in case the scheduler thread needs to reassess its timing based on
                 // the new beatsPerMinute.
-                lock (_threadLock)
-                {
+                lock (_threadLock) {
                     Monitor.Pulse(_threadLock);
                 }
             }
@@ -242,14 +233,11 @@ namespace Midi.Devices
         /// </summary>
         public bool IsRunning
         {
-            get
-            {
-                if (_isSchedulerThread)
-                {
+            get {
+                if (_isSchedulerThread) {
                     return true;
                 }
-                lock (_runLock)
-                {
+                lock (_runLock) {
                     return _isRunning;
                 }
             }
@@ -283,14 +271,11 @@ namespace Midi.Devices
         /// <seealso cref="Reset" />
         public void Start()
         {
-            if (_isSchedulerThread)
-            {
+            if (_isSchedulerThread) {
                 throw new InvalidOperationException("Clock already running.");
             }
-            lock (_runLock)
-            {
-                if (_isRunning)
-                {
+            lock (_runLock) {
+                if (_isRunning) {
                     throw new InvalidOperationException("Clock already running.");
                 }
 
@@ -340,21 +325,17 @@ namespace Midi.Devices
         /// <seealso cref="Reset" />
         public void Stop()
         {
-            if (_isSchedulerThread)
-            {
+            if (_isSchedulerThread) {
                 throw new InvalidOperationException("Can't call Stop() from the scheduler thread.");
             }
-            lock (_runLock)
-            {
-                if (!_isRunning)
-                {
+            lock (_runLock) {
+                if (!_isRunning) {
                     throw new InvalidOperationException("Clock is not running.");
                 }
 
                 // Tell the thread to stop, wait for it to terminate, then discard it.  By the time this is done, we know
                 // that the scheduler will not invoke any more messages.
-                lock (_threadLock)
-                {
+                lock (_threadLock) {
                     _threadShouldExit = true;
                     Monitor.Pulse(_threadLock);
                 }
@@ -383,20 +364,16 @@ namespace Midi.Devices
         /// <seealso cref="Stop" />
         public void Reset()
         {
-            if (_isSchedulerThread)
-            {
+            if (_isSchedulerThread) {
                 throw new InvalidOperationException("Clock is running.");
             }
-            lock (_runLock)
-            {
-                if (_isRunning)
-                {
+            lock (_runLock) {
+                if (_isRunning) {
                     throw new InvalidOperationException("Clock is running.");
                 }
                 _stopwatch.Reset();
                 _millisecondFudge = 0;
-                lock (_threadLock)
-                {
+                lock (_threadLock) {
                     _threadMessageQueue.Clear();
                     Monitor.Pulse(_threadLock);
                 }
@@ -422,8 +399,7 @@ namespace Midi.Devices
         /// </remarks>
         public void Schedule(Message message)
         {
-            lock (_threadLock)
-            {
+            lock (_threadLock) {
                 _threadMessageQueue.AddMessage(message);
                 Monitor.Pulse(_threadLock);
             }
@@ -437,19 +413,13 @@ namespace Midi.Devices
         /// <param name="beatTimeDelta">The delta to apply (or zero).</param>
         public void Schedule(List<Message> messages, float beatTimeDelta)
         {
-            lock (_threadLock)
-            {
-                if (Math.Abs(beatTimeDelta - 0) < float.Epsilon)
-                {
-                    foreach (var message in messages)
-                    {
+            lock (_threadLock) {
+                if (Math.Abs(beatTimeDelta - 0) < float.Epsilon) {
+                    foreach (var message in messages) {
                         _threadMessageQueue.AddMessage(message);
                     }
-                }
-                else
-                {
-                    foreach (var message in messages)
-                    {
+                } else {
+                    foreach (var message in messages) {
                         _threadMessageQueue.AddMessage(message.MakeTimeShiftedCopy(beatTimeDelta));
                     }
                 }
@@ -464,8 +434,8 @@ namespace Midi.Devices
         /// <returns>The positive number of milliseconds, or 0 if beatTime is in the past.</returns>
         private long MillisecondsUntil(float beatTime)
         {
-            var now = (_stopwatch.ElapsedMilliseconds + _millisecondFudge)/_millisecondsPerBeat;
-            return Math.Max(0, (long) ((beatTime - now)*_millisecondsPerBeat));
+            var now = (_stopwatch.ElapsedMilliseconds + _millisecondFudge) / _millisecondsPerBeat;
+            return Math.Max(0, (long)((beatTime - now) * _millisecondsPerBeat));
         }
 
         /// <summary>
@@ -474,31 +444,21 @@ namespace Midi.Devices
         private void ThreadRun()
         {
             _isSchedulerThread = true;
-            lock (_threadLock)
-            {
-                while (true)
-                {
-                    if (_threadShouldExit)
-                    {
+            lock (_threadLock) {
+                while (true) {
+                    if (_threadShouldExit) {
                         return;
                     }
-                    if (_threadMessageQueue.IsEmpty)
-                    {
+                    if (_threadMessageQueue.IsEmpty) {
                         Monitor.Wait(_threadLock);
-                    }
-                    else
-                    {
+                    } else {
                         var millisToWait = MillisecondsUntil(_threadMessageQueue.EarliestTimestamp);
-                        if (millisToWait > 0)
-                        {
-                            Monitor.Wait(_threadLock, (int) millisToWait);
-                        }
-                        else
-                        {
+                        if (millisToWait > 0) {
+                            Monitor.Wait(_threadLock, (int)millisToWait);
+                        } else {
                             _threadProcessingTime = _threadMessageQueue.EarliestTimestamp;
                             var timeslice = _threadMessageQueue.PopEarliest();
-                            foreach (var message in timeslice)
-                            {
+                            foreach (var message in timeslice) {
                                 message.SendNow();
                             }
                         }

@@ -21,13 +21,10 @@ namespace Midi.Devices
         {
             var newPtr = dwParam1.ToIntPtr();
 
-            try
-            {
-                Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
+            try {
+                Marshal.PtrToStructure(newPtr, typeof(MIDIHDR));
                 return true;
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 return false;
             }
         }
@@ -49,15 +46,14 @@ namespace Midi.Devices
             //    throw new ArgumentException("Not a SysEx message.");
             //}
             var newPtr = dwParam1.ToIntPtr();
-            var header = (MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
+            var header = (MIDIHDR)Marshal.PtrToStructure(newPtr, typeof(MIDIHDR));
             data = new byte[header.dwBytesRecorded];
-            for (var i = 0; i < header.dwBytesRecorded; i++)
-            {
+            for (var i = 0; i < header.dwBytesRecorded; i++) {
                 //Array.Resize<byte>(ref data, data.Length + 1);
                 //data[data.Length - 1] = System.Runtime.InteropServices.Marshal.ReadByte(header.lpData, i);
                 data[i] = Marshal.ReadByte(header.lpData, i);
             }
-            timestamp = (uint) dwParam2;
+            timestamp = (uint)dwParam2;
         }
 
         /*

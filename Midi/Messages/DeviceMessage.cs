@@ -14,8 +14,7 @@ namespace Midi.Messages
         protected DeviceMessage(IDeviceBase device, float time)
             : base(time)
         {
-            if (device == null)
-            {
+            if (device == null) {
                 throw new ArgumentNullException(nameof(device));
             }
             Device = device;

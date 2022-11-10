@@ -16,12 +16,10 @@ namespace Midi.Messages
             float time)
             : base(device, channel, time)
         {
-            if (!pitch.IsInMidiRange())
-            {
+            if (!pitch.IsInMidiRange()) {
                 throw new ArgumentOutOfRangeException(nameof(pitch));
             }
-            if (velocity < 0 || velocity > 127)
-            {
+            if (velocity < 0 || velocity > 127) {
                 throw new ArgumentOutOfRangeException(nameof(velocity));
             }
             Pitch = pitch;

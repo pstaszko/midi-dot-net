@@ -31,7 +31,7 @@ using Midi.Win32;
 
 namespace Midi.Devices
 {
-    
+
     public class OutputDevice : DeviceBase, IOutputDevice
     {
         // Access to the global state is guarded by lock(staticLock).
@@ -58,140 +58,122 @@ namespace Midi.Devices
             _caps = caps;
             _isOpen = false;
         }
-        
+
         public bool IsOpen
         {
-            get
-            {
-                lock (this)
-                {
+            get {
+                lock (this) {
                     return _isOpen;
                 }
             }
         }
 
-		public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-		public void Open()
+        public void Open()
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckNotOpen();
-                CheckReturnCode(Win32API.midiOutOpen(out _handle, _deviceId, null, (UIntPtr) 0));
+                CheckReturnCode(Win32API.midiOutOpen(out _handle, _deviceId, null, (UIntPtr)0));
                 _isOpen = true;
             }
         }
-        
+
         public void Close()
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutClose(_handle));
                 _isOpen = false;
             }
         }
-        
+
         public void SilenceAllNotes()
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutReset(_handle));
             }
         }
-        
+
         public void SendNoteOn(Channel channel, Pitch pitch, int velocity)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeNoteOn(channel,
                     pitch, velocity)));
             }
         }
-        
+
         public void SendNoteOff(Channel channel, Pitch pitch, int velocity)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeNoteOff(channel,
                     pitch, velocity)));
             }
         }
-        
+
         public void SendPercussion(Percussion percussion, int velocity)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeNoteOn(
-                    Channel.Channel10, (Pitch) percussion,
+                    Channel.Channel10, (Pitch)percussion,
                     velocity)));
             }
         }
-        
+
         public void SendControlChange(Channel channel, Control control, int value)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeControlChange(
                     channel, control, value)));
             }
         }
-        
+
         public void SendPitchBend(Channel channel, int value)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodePitchBend(channel,
                     value)));
             }
         }
-        
+
         public void SendProgramChange(Channel channel, Instrument instrument)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckReturnCode(Win32API.midiOutShortMsg(_handle, ShortMsg.EncodeProgramChange(
                     channel, instrument)));
             }
         }
-        
+
         public void SendSysEx(byte[] data)
         {
-            lock (this)
-            {
+            lock (this) {
                 //Win32API.MMRESULT result;
                 IntPtr ptr;
-                var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
-                var header = new MIDIHDR {lpData = Marshal.AllocHGlobal(data.Length)};
+                var size = (uint)Marshal.SizeOf(typeof(MIDIHDR));
+                var header = new MIDIHDR { lpData = Marshal.AllocHGlobal(data.Length) };
                 for (var i = 0; i < data.Length; i++)
                     Marshal.WriteByte(header.lpData, i, data[i]);
                 header.dwBufferLength = data.Length;
                 header.dwBytesRecorded = data.Length;
                 header.dwFlags = 0;
 
-                try
-                {
-                    ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (MIDIHDR)));
-                }
-                catch (Exception)
-                {
+                try {
+                    ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MIDIHDR)));
+                } catch (Exception) {
                     Marshal.FreeHGlobal(header.lpData);
                     throw;
                 }
 
-                try
-                {
+                try {
                     Marshal.StructureToPtr(header, ptr, false);
-                }
-                catch (Exception)
-                {
+                } catch (Exception) {
                     Marshal.FreeHGlobal(header.lpData);
                     Marshal.FreeHGlobal(ptr);
                     throw;
@@ -211,8 +193,7 @@ namespace Midi.Devices
 
         public void SendNrpn(Channel channel, int parameter, int value)
         {
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
 
                 var parameter14 = new Int14(parameter);
@@ -238,30 +219,26 @@ namespace Midi.Devices
 
         private static void CheckReturnCode(MMRESULT rc)
         {
-            if (rc != MMRESULT.MMSYSERR_NOERROR)
-            {
+            if (rc != MMRESULT.MMSYSERR_NOERROR) {
                 var errorMsg = new StringBuilder(128);
                 rc = Win32API.midiOutGetErrorText(rc, errorMsg);
-                if (rc != MMRESULT.MMSYSERR_NOERROR)
-                {
+                if (rc != MMRESULT.MMSYSERR_NOERROR) {
                     throw new DeviceException("no error details");
                 }
                 throw new DeviceException(errorMsg.ToString());
             }
         }
-        
+
         private void CheckOpen()
         {
-            if (!_isOpen)
-            {
+            if (!_isOpen) {
                 throw new InvalidOperationException("device not open");
             }
         }
 
         private void CheckNotOpen()
         {
-            if (_isOpen)
-            {
+            if (_isOpen) {
                 throw new InvalidOperationException("device open");
             }
         }

@@ -27,7 +27,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            ((OutputDevice) Device).SendNoteOn(Channel, Pitch, Velocity);
+            ((OutputDevice)Device).SendNoteOn(Channel, Pitch, Velocity);
         }
 
         /// <summary>

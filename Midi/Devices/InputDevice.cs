@@ -68,14 +68,11 @@ namespace Midi.Devices
 
         public bool IsOpen
         {
-            get
-            {
-                if (_isInsideInputHandler)
-                {
+            get {
+                if (_isInsideInputHandler) {
                     return true;
                 }
-                lock (this)
-                {
+                lock (this) {
                     return _isOpen;
                 }
             }
@@ -83,21 +80,18 @@ namespace Midi.Devices
 
         public bool IsReceiving
         {
-            get
-            {
-                if (_isInsideInputHandler)
-                {
+            get {
+                if (_isInsideInputHandler) {
                     return true;
                 }
-                lock (this)
-                {
+                lock (this) {
                     return _isReceiving;
                 }
             }
         }
-		public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-		public event NoteOnHandler NoteOn;
+        public event NoteOnHandler NoteOn;
         public event NoteOffHandler NoteOff;
         public event ControlChangeHandler ControlChange;
         public event ProgramChangeHandler ProgramChange;
@@ -117,31 +111,26 @@ namespace Midi.Devices
 
         public void Open()
         {
-            if (_isInsideInputHandler)
-            {
+            if (_isInsideInputHandler) {
                 throw new InvalidOperationException("Device is open.");
             }
-            lock (this)
-            {
+            lock (this) {
                 CheckNotOpen();
-                CheckReturnCode(Win32API.midiInOpen(out _handle, _deviceId, _inputCallbackDelegate, (UIntPtr) 0));
+                CheckReturnCode(Win32API.midiInOpen(out _handle, _deviceId, _inputCallbackDelegate, (UIntPtr)0));
                 _isOpen = true;
             }
         }
 
         public void Close()
         {
-            if (_isInsideInputHandler)
-            {
+            if (_isInsideInputHandler) {
                 throw new InvalidOperationException("Device is receiving.");
             }
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
 
                 _isClosing = true;
-                if (_longMsgBuffers.Count > 0)
-                {
+                if (_longMsgBuffers.Count > 0) {
                     CheckReturnCode(Win32API.midiInReset(_handle));
                 }
                 //Destroy any Long Message buffers we created when opening this device.
@@ -167,17 +156,14 @@ namespace Midi.Devices
 
         public void StartReceiving(Clock clock, bool handleSysEx)
         {
-            if (_isInsideInputHandler)
-            {
+            if (_isInsideInputHandler) {
                 throw new InvalidOperationException("Device is receiving.");
             }
-            lock (this)
-            {
+            lock (this) {
                 CheckOpen();
                 CheckNotReceiving();
 
-                if (handleSysEx)
-                {
+                if (handleSysEx) {
                     _longMsgBuffers.Add(CreateLongMsgBuffer());
                 }
 
@@ -189,13 +175,11 @@ namespace Midi.Devices
 
         public void StopReceiving()
         {
-            if (_isInsideInputHandler)
-            {
+            if (_isInsideInputHandler) {
                 throw new InvalidOperationException(
                     "Can't call StopReceiving() from inside an input handler.");
             }
-            lock (this)
-            {
+            lock (this) {
                 CheckReceiving();
                 CheckReturnCode(Win32API.midiInStop(_handle));
                 _clock = null;
@@ -207,22 +191,18 @@ namespace Midi.Devices
             UIntPtr dwInstance, UIntPtr dwParam1, UIntPtr dwParam2)
         {
             _isInsideInputHandler = true;
-            try
-            {
-                switch (wMsg)
-                {
-                    case MidiInMessage.MIM_DATA:
-                    {
-                        HandleInputMimData(dwParam1, dwParam2);
-                        break;
-                    }
-                    case MidiInMessage.MIM_LONGDATA:
-                    {
-                        HandleInputMimLongData(dwParam1, dwParam2);
-                    }
+            try {
+                switch (wMsg) {
+                    case MidiInMessage.MIM_DATA: {
+                            HandleInputMimData(dwParam1, dwParam2);
+                            break;
+                        }
+                    case MidiInMessage.MIM_LONGDATA: {
+                            HandleInputMimLongData(dwParam1, dwParam2);
+                        }
                         break;
                     case MidiInMessage.MIM_MOREDATA:
-                        SysEx?.Invoke(new SysExMessage(this, new byte[] {0x13}, 13));
+                        SysEx?.Invoke(new SysExMessage(this, new byte[] { 0x13 }, 13));
                         break;
                     case MidiInMessage.MIM_OPEN:
                         //SysEx(new SysExMessage(this, new byte[] { 0x01 }, 1));
@@ -231,18 +211,16 @@ namespace Midi.Devices
                         //SysEx(new SysExMessage(this, new byte[] { 0x02 }, 2));
                         break;
                     case MidiInMessage.MIM_ERROR:
-                        SysEx?.Invoke(new SysExMessage(this, new byte[] {0x03}, 3));
+                        SysEx?.Invoke(new SysExMessage(this, new byte[] { 0x03 }, 3));
                         break;
                     case MidiInMessage.MIM_LONGERROR:
-                        SysEx?.Invoke(new SysExMessage(this, new byte[] {0x04}, 4));
+                        SysEx?.Invoke(new SysExMessage(this, new byte[] { 0x04 }, 4));
                         break;
                     default:
-                        SysEx?.Invoke(new SysExMessage(this, new byte[] {0x05}, 5));
+                        SysEx?.Invoke(new SysExMessage(this, new byte[] { 0x05 }, 5));
                         break;
                 }
-            }
-            finally
-            {
+            } finally {
                 _isInsideInputHandler = false;
             }
         }
@@ -254,66 +232,51 @@ namespace Midi.Devices
             int velocity;
             int value;
             uint win32Timestamp;
-            if (ShortMsg.IsNoteOn(dwParam1, dwParam2))
-            {
+            if (ShortMsg.IsNoteOn(dwParam1, dwParam2)) {
                 if (NoteOn == null) return;
 
-                ShortMsg.DecodeNoteOn(dwParam1, dwParam2, out channel, out pitch,out velocity, out win32Timestamp);
-                NoteOn(new NoteOnMessage(this, channel, pitch, velocity,_clock?.Time ?? win32Timestamp/1000f));
-            }
-            else if (ShortMsg.IsNoteOff(dwParam1, dwParam2))
-            {
+                ShortMsg.DecodeNoteOn(dwParam1, dwParam2, out channel, out pitch, out velocity, out win32Timestamp);
+                NoteOn(new NoteOnMessage(this, channel, pitch, velocity, _clock?.Time ?? win32Timestamp / 1000f));
+            } else if (ShortMsg.IsNoteOff(dwParam1, dwParam2)) {
                 if (NoteOff == null) return;
 
-                ShortMsg.DecodeNoteOff(dwParam1, dwParam2, out channel, out pitch,out velocity, out win32Timestamp);
-                NoteOff(new NoteOffMessage(this, channel, pitch, velocity,_clock?.Time ?? win32Timestamp/1000f));
-            }
-            else if (ShortMsg.IsControlChange(dwParam1, dwParam2))
-            {
+                ShortMsg.DecodeNoteOff(dwParam1, dwParam2, out channel, out pitch, out velocity, out win32Timestamp);
+                NoteOff(new NoteOffMessage(this, channel, pitch, velocity, _clock?.Time ?? win32Timestamp / 1000f));
+            } else if (ShortMsg.IsControlChange(dwParam1, dwParam2)) {
                 Control control;
                 ShortMsg.DecodeControlChange(dwParam1, dwParam2, out channel, out control, out value, out win32Timestamp);
 
-                var msg = new ControlChangeMessage(this, channel, control, value, _clock?.Time ?? win32Timestamp/1000f);
+                var msg = new ControlChangeMessage(this, channel, control, value, _clock?.Time ?? win32Timestamp / 1000f);
                 _nrpnWatcher.ReceivedControlChange(msg);
-            }
-            else if (ShortMsg.IsProgramChange(dwParam1, dwParam2))
-            {
+            } else if (ShortMsg.IsProgramChange(dwParam1, dwParam2)) {
                 if (ProgramChange == null) return;
 
                 Instrument instrument;
-                ShortMsg.DecodeProgramChange(dwParam1, dwParam2, out channel,out instrument, out win32Timestamp);
-                ProgramChange(new ProgramChangeMessage(this, channel, instrument,_clock?.Time ?? win32Timestamp/1000f));
-            }
-            else if (ShortMsg.IsPitchBend(dwParam1, dwParam2))
-            {
+                ShortMsg.DecodeProgramChange(dwParam1, dwParam2, out channel, out instrument, out win32Timestamp);
+                ProgramChange(new ProgramChangeMessage(this, channel, instrument, _clock?.Time ?? win32Timestamp / 1000f));
+            } else if (ShortMsg.IsPitchBend(dwParam1, dwParam2)) {
                 if (PitchBend == null) return;
 
-                ShortMsg.DecodePitchBend(dwParam1, dwParam2, out channel,out value, out win32Timestamp);
-                PitchBend(new PitchBendMessage(this, channel, value,_clock?.Time ?? win32Timestamp/1000f));
+                ShortMsg.DecodePitchBend(dwParam1, dwParam2, out channel, out value, out win32Timestamp);
+                PitchBend(new PitchBendMessage(this, channel, value, _clock?.Time ?? win32Timestamp / 1000f));
             }
         }
 
         private void HandleInputMimLongData(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            if (LongMsg.IsSysEx(dwParam1, dwParam2))
-            {
-                if (SysEx != null)
-                {
+            if (LongMsg.IsSysEx(dwParam1, dwParam2)) {
+                if (SysEx != null) {
                     byte[] data;
                     uint win32Timestamp;
                     LongMsg.DecodeSysEx(dwParam1, dwParam2, out data, out win32Timestamp);
-                    if (data.Length != 0)
-                    {
-                        SysEx(new SysExMessage(this, data, _clock?.Time ?? win32Timestamp/1000f));
+                    if (data.Length != 0) {
+                        SysEx(new SysExMessage(this, data, _clock?.Time ?? win32Timestamp / 1000f));
                     }
 
-                    if (_isClosing)
-                    {
+                    if (_isClosing) {
                         //buffers no longer needed
                         DestroyLongMsgBuffer(dwParam1);
-                    }
-                    else
-                    {
+                    } else {
                         //prepare the buffer for the next message
                         RecycleLongMsgBuffer(dwParam1);
                     }
@@ -323,12 +286,10 @@ namespace Midi.Devices
 
         private static void CheckReturnCode(MMRESULT rc)
         {
-            if (rc != MMRESULT.MMSYSERR_NOERROR)
-            {
+            if (rc != MMRESULT.MMSYSERR_NOERROR) {
                 var errorMsg = new StringBuilder(128);
                 rc = Win32API.midiInGetErrorText(rc, errorMsg);
-                if (rc != MMRESULT.MMSYSERR_NOERROR)
-                {
+                if (rc != MMRESULT.MMSYSERR_NOERROR) {
                     throw new DeviceException("no error details");
                 }
                 throw new DeviceException(errorMsg.ToString());
@@ -337,32 +298,28 @@ namespace Midi.Devices
 
         private void CheckOpen()
         {
-            if (!_isOpen)
-            {
+            if (!_isOpen) {
                 throw new InvalidOperationException("Device is not open.");
             }
         }
 
         private void CheckNotOpen()
         {
-            if (_isOpen)
-            {
+            if (_isOpen) {
                 throw new InvalidOperationException("Device is open.");
             }
         }
 
         private void CheckReceiving()
         {
-            if (!_isReceiving)
-            {
+            if (!_isReceiving) {
                 throw new DeviceException("device not receiving");
             }
         }
 
         private void CheckNotReceiving()
         {
-            if (_isReceiving)
-            {
+            if (_isReceiving) {
                 throw new DeviceException("device receiving");
             }
         }
@@ -371,30 +328,23 @@ namespace Midi.Devices
         {
             //add a buffer so we can receive SysEx messages
             IntPtr ptr;
-            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
-            var header = new MIDIHDR
-            {
+            var size = (uint)Marshal.SizeOf(typeof(MIDIHDR));
+            var header = new MIDIHDR {
                 lpData = Marshal.AllocHGlobal(4096),
                 dwBufferLength = 4096,
                 dwFlags = 0
             };
 
-            try
-            {
-                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof (MIDIHDR)));
-            }
-            catch (Exception)
-            {
+            try {
+                ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MIDIHDR)));
+            } catch (Exception) {
                 Marshal.FreeHGlobal(header.lpData);
                 throw;
             }
 
-            try
-            {
+            try {
                 Marshal.StructureToPtr(header, ptr, false);
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
                 Marshal.FreeHGlobal(header.lpData);
                 Marshal.FreeHGlobal(ptr);
                 throw;
@@ -410,7 +360,7 @@ namespace Midi.Devices
         private void RecycleLongMsgBuffer(UIntPtr ptr)
         {
             var newPtr = ptr.ToIntPtr();
-            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
+            var size = (uint)Marshal.SizeOf(typeof(MIDIHDR));
             CheckReturnCode(Win32API.midiInUnprepareHeader(_handle, newPtr, size));
             CheckReturnCode(Win32API.midiInPrepareHeader(_handle, newPtr, size));
             CheckReturnCode(Win32API.midiInAddBuffer(_handle, newPtr, size));
@@ -420,10 +370,10 @@ namespace Midi.Devices
         private void DestroyLongMsgBuffer(UIntPtr ptr)
         {
             var newPtr = ptr.ToIntPtr();
-            var size = (uint) Marshal.SizeOf(typeof (MIDIHDR));
+            var size = (uint)Marshal.SizeOf(typeof(MIDIHDR));
             CheckReturnCode(Win32API.midiInUnprepareHeader(_handle, newPtr, size));
 
-            var header = (MIDIHDR) Marshal.PtrToStructure(newPtr, typeof (MIDIHDR));
+            var header = (MIDIHDR)Marshal.PtrToStructure(newPtr, typeof(MIDIHDR));
             Marshal.FreeHGlobal(header.lpData);
             Marshal.FreeHGlobal(newPtr);
 
@@ -436,7 +386,7 @@ namespace Midi.Devices
             private readonly Queue<ControlChangeMessage> _messageQueue;
             private bool _queueMessages;
             private Control _lastControl;
-            
+
             public NrpnWatcher(InputDevice device)
             {
                 _device = device;
@@ -447,35 +397,26 @@ namespace Midi.Devices
             {
                 var control = msg.Control;
 
-                if (_queueMessages)
-                {
+                if (_queueMessages) {
                     // Check if messages are following the NRPN protocol
-                    if (IsExpectedControl(control))
-                    {
+                    if (IsExpectedControl(control)) {
                         _messageQueue.Enqueue(msg);
 
                         // When we have all four NRPN messages, we can assemble and send it
-                        if (_messageQueue.Count == 4)
-                        {
+                        if (_messageQueue.Count == 4) {
                             SendNrpn();
                         }
-                    }
-                    else
-                    {
+                    } else {
                         // Messages cannot be a NRPN, release queue
                         ReleaseQueue();
                         SendControlChange(msg);
                     }
-                }
-                else if (msg.Control == Control.NonRegisteredParameterMSB)
-                {
+                } else if (msg.Control == Control.NonRegisteredParameterMSB) {
                     // Might be start of NRPN, start queueing messages
                     _queueMessages = true;
 
                     _messageQueue.Enqueue(msg);
-                }
-                else
-                {
+                } else {
                     SendControlChange(msg);
                 }
 
@@ -485,8 +426,7 @@ namespace Midi.Devices
 
             private void ReleaseQueue()
             {
-                while (_messageQueue.Count > 0)
-                {
+                while (_messageQueue.Count > 0) {
                     var msg = _messageQueue.Dequeue();
                     SendControlChange(msg);
                 }
@@ -502,17 +442,14 @@ namespace Midi.Devices
             private void SendNrpn()
             {
                 var nrpn = _device.Nrpn;
-                if (nrpn != null)
-                {
+                if (nrpn != null) {
                     var firstMsg = _messageQueue.Peek();
                     var parameter = DequeueInt14();
                     var value = DequeueInt14();
 
                     var msg = new NrpnMessage(_device, firstMsg.Channel, parameter.Value, value.Value, firstMsg.Time);
                     nrpn(msg);
-                }
-                else
-                {
+                } else {
                     _messageQueue.Clear();
                 }
 
@@ -525,9 +462,8 @@ namespace Midi.Devices
                 if (_messageQueue.Count < 2)
                     throw new InvalidOperationException(
                         $"Cannot construct 14-bit Integer from message queue, as there are only {_messageQueue.Count} messages, needs at least 2");
-                
-                return new Int14
-                {
+
+                return new Int14 {
                     MSB = _messageQueue.Dequeue().Value,
                     LSB = _messageQueue.Dequeue().Value
                 };
@@ -535,8 +471,7 @@ namespace Midi.Devices
 
             private bool IsExpectedControl(Control control)
             {
-                switch (control)
-                {
+                switch (control) {
                     case Control.NonRegisteredParameterLSB:
                         return _lastControl == Control.NonRegisteredParameterMSB;
                     case Control.DataEntryMSB:

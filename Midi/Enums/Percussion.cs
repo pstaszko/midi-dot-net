@@ -264,7 +264,7 @@ namespace Midi.Enums
         /// <param name="percussion">The percussion to test.</param>
         public static bool IsValid(this Percussion percussion)
         {
-            return (int) percussion >= 35 && (int) percussion <= 81;
+            return (int)percussion >= 35 && (int)percussion <= 81;
         }
 
         /// <summary>
@@ -276,8 +276,7 @@ namespace Midi.Enums
         /// </exception>
         public static void Validate(this Percussion percussion)
         {
-            if (!percussion.IsValid())
-            {
+            if (!percussion.IsValid()) {
                 throw new ArgumentOutOfRangeException(nameof(percussion));
             }
         }
@@ -289,7 +288,7 @@ namespace Midi.Enums
         public static string Name(this Percussion percussion)
         {
             percussion.Validate();
-            return PercussionNames[(int) percussion - 35];
+            return PercussionNames[(int)percussion - 35];
         }
     }
 }

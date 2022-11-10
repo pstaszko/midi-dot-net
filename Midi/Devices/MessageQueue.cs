@@ -50,10 +50,8 @@ namespace Midi.Devices
         /// Throws an exception if the queue is empty.
         public float EarliestTimestamp
         {
-            get
-            {
-                if (IsEmpty)
-                {
+            get {
+                if (IsEmpty) {
                     throw new InvalidOperationException("queue is empty");
                 }
                 return _messages.First.Value[0].Time;
@@ -73,32 +71,25 @@ namespace Midi.Devices
         {
             // If the list is empty or message is later than any message we already have, we can add this
             // as a new timeslice to the end.
-            if (IsEmpty || message.Time > _messages.Last.Value[0].Time)
-            {
-                var timeslice = new List<Message> {message};
+            if (IsEmpty || message.Time > _messages.Last.Value[0].Time) {
+                var timeslice = new List<Message> { message };
                 _messages.AddLast(timeslice);
                 return;
             }
             // We need to scan through the list to find where this should be inserted.
             var node = _messages.Last;
-            while (node.Previous != null && node.Value[0].Time > message.Time)
-            {
+            while (node.Previous != null && node.Value[0].Time > message.Time) {
                 node = node.Previous;
             }
             // At this point, node refers to a LinkedListNode which either has the correct
             // timestamp, or else a new timeslice needs to be added before or after node.
-            if (node.Value[0].Time < message.Time)
-            {
-                var timeslice = new List<Message> {message};
+            if (node.Value[0].Time < message.Time) {
+                var timeslice = new List<Message> { message };
                 _messages.AddAfter(node, timeslice);
-            }
-            else if (node.Value[0].Time > message.Time)
-            {
-                var timeslice = new List<Message> {message};
+            } else if (node.Value[0].Time > message.Time) {
+                var timeslice = new List<Message> { message };
                 _messages.AddBefore(node, timeslice);
-            }
-            else
-            {
+            } else {
                 node.Value.Add(message);
             }
         }
@@ -116,8 +107,7 @@ namespace Midi.Devices
         /// </summary>
         public List<Message> PopEarliest()
         {
-            if (IsEmpty)
-            {
+            if (IsEmpty) {
                 throw new InvalidOperationException("queue is empty");
             }
             var result = _messages.First.Value;

@@ -20,8 +20,7 @@ namespace Midi.Common
         public int Value
         {
             get => MSB << 7 | LSB;
-            set
-            {
+            set {
                 MSB = value >> 7;
                 LSB = value & 0x7F;
             }

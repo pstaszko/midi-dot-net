@@ -484,7 +484,7 @@ namespace Midi.Enums
         /// <returns>True if the pitch is in [0..127].</returns>
         public static bool IsInMidiRange(this Pitch pitch)
         {
-            return (int) pitch >= 0 && (int) pitch < 128;
+            return (int)pitch >= 0 && (int)pitch < 128;
         }
 
         /// <summary>
@@ -497,8 +497,8 @@ namespace Midi.Enums
         /// </returns>
         public static int Octave(this Pitch pitch)
         {
-            var p = (int) pitch;
-            return (p < 0 ? (p - 11)/12 : p/12) - 1;
+            var p = (int)pitch;
+            return (p < 0 ? (p - 11) / 12 : p / 12) - 1;
         }
 
         /// <summary>
@@ -511,8 +511,8 @@ namespace Midi.Enums
         /// </returns>
         public static int PositionInOctave(this Pitch pitch)
         {
-            var p = (int) pitch;
-            return p < 0 ? 11 - (-p - 1)%12 : p%12;
+            var p = (int)pitch;
+            return p < 0 ? 11 - (-p - 1) % 12 : p % 12;
         }
 
         /// <summary>
@@ -555,16 +555,14 @@ namespace Midi.Enums
         /// <exception cref="ArgumentOutOfRangeException">letter is out of range.</exception>
         public static Note NoteWithLetter(this Pitch pitch, char letter)
         {
-            if (letter < 'A' || letter > 'G')
-            {
+            if (letter < 'A' || letter > 'G') {
                 throw new ArgumentOutOfRangeException();
             }
             var pitchNote = pitch.NotePreferringSharps();
             var letterNote = new Note(letter);
             var upTo = letterNote.SemitonesUpTo(pitchNote);
             var downTo = letterNote.SemitonesDownTo(pitchNote);
-            if (upTo <= downTo)
-            {
+            if (upTo <= downTo) {
                 return new Note(letter, upTo);
             }
             return new Note(letter, -downTo);

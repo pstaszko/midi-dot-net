@@ -644,7 +644,7 @@ namespace Midi.Enums
         /// <param name="instrument">The instrument to test.</param>
         public static bool IsValid(this Instrument instrument)
         {
-            return (int) instrument >= 0 && (int) instrument < 128;
+            return (int)instrument >= 0 && (int)instrument < 128;
         }
 
         /// <summary>
@@ -656,8 +656,7 @@ namespace Midi.Enums
         /// </exception>
         public static void Validate(this Instrument instrument)
         {
-            if (!instrument.IsValid())
-            {
+            if (!instrument.IsValid()) {
                 throw new ArgumentOutOfRangeException(nameof(instrument));
             }
         }
@@ -672,7 +671,7 @@ namespace Midi.Enums
         public static string Name(this Instrument instrument)
         {
             instrument.Validate();
-            return InstrumentNames[(int) instrument];
+            return InstrumentNames[(int)instrument];
         }
     }
 }

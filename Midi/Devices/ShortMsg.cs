@@ -39,7 +39,7 @@ namespace Midi.Devices
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsNoteOn(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int) dwParam1 & 0xf0) == 0x90;
+            return ((int)dwParam1 & 0xf0) == 0x90;
         }
 
         /// <summary>
@@ -57,14 +57,13 @@ namespace Midi.Devices
         public static void DecodeNoteOn(UIntPtr dwParam1, UIntPtr dwParam2,
             out Channel channel, out Pitch pitch, out int velocity, out uint timestamp)
         {
-            if (!IsNoteOn(dwParam1, dwParam2))
-            {
+            if (!IsNoteOn(dwParam1, dwParam2)) {
                 throw new ArgumentException("Not a Note On message.");
             }
-            channel = (Channel) ((int) dwParam1 & 0x0f);
-            pitch = (Pitch) (((int) dwParam1 & 0xff00) >> 8);
-            velocity = ((int) dwParam1 & 0xff0000) >> 16;
-            timestamp = (uint) dwParam2;
+            channel = (Channel)((int)dwParam1 & 0x0f);
+            pitch = (Pitch)(((int)dwParam1 & 0xff00) >> 8);
+            velocity = ((int)dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint)dwParam2;
         }
 
         /// <summary>
@@ -78,15 +77,13 @@ namespace Midi.Devices
         public static uint EncodeNoteOn(Channel channel, Pitch pitch, int velocity)
         {
             channel.Validate();
-            if (!pitch.IsInMidiRange())
-            {
+            if (!pitch.IsInMidiRange()) {
                 throw new ArgumentOutOfRangeException(nameof(pitch));
             }
-            if (velocity < 0 || velocity > 127)
-            {
+            if (velocity < 0 || velocity > 127) {
                 throw new ArgumentOutOfRangeException(nameof(velocity));
             }
-            return (uint) (0x90 | (int) channel | ((int) pitch << 8) | (velocity << 16));
+            return (uint)(0x90 | (int)channel | ((int)pitch << 8) | (velocity << 16));
         }
 
 
@@ -97,7 +94,7 @@ namespace Midi.Devices
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsNoteOff(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int) dwParam1 & 0xf0) == 0x80;
+            return ((int)dwParam1 & 0xf0) == 0x80;
         }
 
         /// <summary>
@@ -115,14 +112,13 @@ namespace Midi.Devices
         public static void DecodeNoteOff(UIntPtr dwParam1, UIntPtr dwParam2,
             out Channel channel, out Pitch pitch, out int velocity, out uint timestamp)
         {
-            if (!IsNoteOff(dwParam1, dwParam2))
-            {
+            if (!IsNoteOff(dwParam1, dwParam2)) {
                 throw new ArgumentException("Not a Note Off message.");
             }
-            channel = (Channel) ((int) dwParam1 & 0x0f);
-            pitch = (Pitch) (((int) dwParam1 & 0xff00) >> 8);
-            velocity = ((int) dwParam1 & 0xff0000) >> 16;
-            timestamp = (uint) dwParam2;
+            channel = (Channel)((int)dwParam1 & 0x0f);
+            pitch = (Pitch)(((int)dwParam1 & 0xff00) >> 8);
+            velocity = ((int)dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint)dwParam2;
         }
 
         /// <summary>
@@ -135,15 +131,13 @@ namespace Midi.Devices
         public static uint EncodeNoteOff(Channel channel, Pitch pitch, int velocity)
         {
             channel.Validate();
-            if (!pitch.IsInMidiRange())
-            {
+            if (!pitch.IsInMidiRange()) {
                 throw new ArgumentOutOfRangeException(nameof(pitch));
             }
-            if (velocity < 0 || velocity > 127)
-            {
+            if (velocity < 0 || velocity > 127) {
                 throw new ArgumentOutOfRangeException(nameof(velocity));
             }
-            return (uint) (0x80 | (int) channel | ((int) pitch << 8) | (velocity << 16));
+            return (uint)(0x80 | (int)channel | ((int)pitch << 8) | (velocity << 16));
         }
 
         /// <summary>
@@ -153,7 +147,7 @@ namespace Midi.Devices
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsControlChange(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int) dwParam1 & 0xf0) == 0xB0;
+            return ((int)dwParam1 & 0xf0) == 0xB0;
         }
 
         /// <summary>
@@ -171,14 +165,13 @@ namespace Midi.Devices
         public static void DecodeControlChange(UIntPtr dwParam1, UIntPtr dwParam2,
             out Channel channel, out Control control, out int value, out uint timestamp)
         {
-            if (!IsControlChange(dwParam1, dwParam2))
-            {
+            if (!IsControlChange(dwParam1, dwParam2)) {
                 throw new ArgumentException("Not a control message.");
             }
-            channel = (Channel) ((int) dwParam1 & 0x0f);
-            control = (Control) (((int) dwParam1 & 0xff00) >> 8);
-            value = ((int) dwParam1 & 0xff0000) >> 16;
-            timestamp = (uint) dwParam2;
+            channel = (Channel)((int)dwParam1 & 0x0f);
+            control = (Control)(((int)dwParam1 & 0xff00) >> 8);
+            value = ((int)dwParam1 & 0xff0000) >> 16;
+            timestamp = (uint)dwParam2;
         }
 
         /// <summary>
@@ -192,11 +185,10 @@ namespace Midi.Devices
         {
             channel.Validate();
             control.Validate();
-            if (value < 0 || value > 127)
-            {
+            if (value < 0 || value > 127) {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
-            return (uint) (0xB0 | (int) channel | ((int) control << 8) | (value << 16));
+            return (uint)(0xB0 | (int)channel | ((int)control << 8) | (value << 16));
         }
 
         /// <summary>
@@ -206,7 +198,7 @@ namespace Midi.Devices
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsProgramChange(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int) dwParam1 & 0xf0) == 0xC0;
+            return ((int)dwParam1 & 0xf0) == 0xC0;
         }
 
         /// <summary>
@@ -223,13 +215,12 @@ namespace Midi.Devices
         public static void DecodeProgramChange(UIntPtr dwParam1, UIntPtr dwParam2,
             out Channel channel, out Instrument instrument, out uint timestamp)
         {
-            if (!IsProgramChange(dwParam1, dwParam2))
-            {
+            if (!IsProgramChange(dwParam1, dwParam2)) {
                 throw new ArgumentException("Not a program change message.");
             }
-            channel = (Channel) ((int) dwParam1 & 0x0f);
-            instrument = (Instrument) (((int) dwParam1 & 0xff00) >> 8);
-            timestamp = (uint) dwParam2;
+            channel = (Channel)((int)dwParam1 & 0x0f);
+            instrument = (Instrument)(((int)dwParam1 & 0xff00) >> 8);
+            timestamp = (uint)dwParam2;
         }
 
         /// <summary>
@@ -242,7 +233,7 @@ namespace Midi.Devices
         {
             channel.Validate();
             instrument.Validate();
-            return (uint) (0xC0 | (int) channel | ((int) instrument << 8));
+            return (uint)(0xC0 | (int)channel | ((int)instrument << 8));
         }
 
         /// <summary>
@@ -252,7 +243,7 @@ namespace Midi.Devices
         /// <param name="dwParam2">The dwParam2 arg passed to MidiInProc.</param>
         public static bool IsPitchBend(UIntPtr dwParam1, UIntPtr dwParam2)
         {
-            return ((int) dwParam1 & 0xf0) == 0xE0;
+            return ((int)dwParam1 & 0xf0) == 0xE0;
         }
 
         /// <summary>
@@ -271,13 +262,12 @@ namespace Midi.Devices
         public static void DecodePitchBend(UIntPtr dwParam1, UIntPtr dwParam2,
             out Channel channel, out int value, out uint timestamp)
         {
-            if (!IsPitchBend(dwParam1, dwParam2))
-            {
+            if (!IsPitchBend(dwParam1, dwParam2)) {
                 throw new ArgumentException("Not a pitch bend message.");
             }
-            channel = (Channel) ((int) dwParam1 & 0x0f);
-            value = (((int) dwParam1 >> 9) & 0x3f80) | (((int) dwParam1 >> 8) & 0x7f);
-            timestamp = (uint) dwParam2;
+            channel = (Channel)((int)dwParam1 & 0x0f);
+            value = (((int)dwParam1 >> 9) & 0x3f80) | (((int)dwParam1 >> 8) & 0x7f);
+            timestamp = (uint)dwParam2;
         }
 
         /// <summary>
@@ -289,11 +279,10 @@ namespace Midi.Devices
         public static uint EncodePitchBend(Channel channel, int value)
         {
             channel.Validate();
-            if (value < 0 || value > 16383)
-            {
+            if (value < 0 || value > 16383) {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
-            return (uint) (0xE0 | (int) channel | ((value & 0x7f) << 8) |
+            return (uint)(0xE0 | (int)channel | ((value & 0x7f) << 8) |
                            ((value & 0x3f80) << 9));
         }
     }

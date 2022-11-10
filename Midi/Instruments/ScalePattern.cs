@@ -25,13 +25,11 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentException">ascent is invalid.</exception>
         public ScalePattern(string name, int[] ascent)
         {
-            if (name == null || ascent == null)
-            {
+            if (name == null || ascent == null) {
                 throw new ArgumentNullException();
             }
             // Make sure ascent is valid.
-            if (!AscentIsValid(ascent))
-            {
+            if (!AscentIsValid(ascent)) {
                 throw new ArgumentException("ascent is invalid.");
             }
             Name = string.Copy(name);
@@ -89,7 +87,7 @@ namespace Midi.Instruments
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((ScalePattern) obj);
+            return Equals((ScalePattern)obj);
         }
 
         /// <summary>
@@ -97,15 +95,14 @@ namespace Midi.Instruments
         /// </summary>
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return ((Name?.GetHashCode() ?? 0)*397) ^ (Ascent?.GetHashCode() ?? 0);
+            unchecked {
+                return ((Name?.GetHashCode() ?? 0) * 397) ^ (Ascent?.GetHashCode() ?? 0);
             }
         }
 
         protected bool Equals(ScalePattern other)
         {
-            return string.Equals(Name, other.Name) 
+            return string.Equals(Name, other.Name)
                 && Ascent.SequenceEqual(other.Ascent);
         }
 
@@ -113,15 +110,12 @@ namespace Midi.Instruments
         private bool AscentIsValid(int[] ascent)
         {
             // Make sure it is non-empty, starts at zero, and ends before 12.
-            if (ascent.Length < 2 || ascent[0] != 0 || ascent[ascent.Length - 1] >= 12)
-            {
+            if (ascent.Length < 2 || ascent[0] != 0 || ascent[ascent.Length - 1] >= 12) {
                 return false;
             }
             // Make sure it's monotonically increasing.
-            for (var i = 1; i < ascent.Length; ++i)
-            {
-                if (ascent[i] <= ascent[i - 1])
-                {
+            for (var i = 1; i < ascent.Length; ++i) {
+                if (ascent[i] <= ascent[i - 1]) {
                     return false;
                 }
             }

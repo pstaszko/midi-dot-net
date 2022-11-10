@@ -19,14 +19,10 @@ namespace Midi.Devices
         /// </summary>
         public static ReadOnlyCollection<IInputDevice> InputDevices
         {
-            get
-            {
-                if (_inputDevices == null)
-                {
-                    lock (InputDeviceLock)
-                    {
-                        if (_inputDevices == null)
-                        {
+            get {
+                if (_inputDevices == null) {
+                    lock (InputDeviceLock) {
+                        if (_inputDevices == null) {
                             var inputDevices = EnumerateInputDevices();
                             _inputDevices = inputDevices;
                         }
@@ -42,14 +38,10 @@ namespace Midi.Devices
         /// </summary>
         public static ReadOnlyCollection<IOutputDevice> OutputDevices
         {
-            get
-            {
-                if (_outputDevices == null)
-                {
-                    lock (OutputDeviceLock)
-                    {
-                        if (_outputDevices == null)
-                        {
+            get {
+                if (_outputDevices == null) {
+                    lock (OutputDeviceLock) {
+                        if (_outputDevices == null) {
                             var outputDevices = EnumerateOutputDevices();
                             _outputDevices = outputDevices;
                         }
@@ -65,8 +57,7 @@ namespace Midi.Devices
         /// </summary>
         public static void UpdateInputDevices()
         {
-            lock (InputDeviceLock)
-            {
+            lock (InputDeviceLock) {
                 _inputDevices = null;
             }
         }
@@ -76,8 +67,7 @@ namespace Midi.Devices
         /// </summary>
         public static void UpdateOutputDevices()
         {
-            lock (OutputDeviceLock)
-            {
+            lock (OutputDeviceLock) {
                 _outputDevices = null;
             }
         }
@@ -86,11 +76,10 @@ namespace Midi.Devices
         {
             var inDevs = Win32API.midiInGetNumDevs();
             var result = new IInputDevice[inDevs];
-            for (uint deviceId = 0; deviceId < inDevs; deviceId++)
-            {
+            for (uint deviceId = 0; deviceId < inDevs; deviceId++) {
                 MIDIINCAPS caps;
-                Win32API.midiInGetDevCaps((UIntPtr) deviceId, out caps);
-                result[deviceId] = new InputDevice((UIntPtr) deviceId, caps);
+                Win32API.midiInGetDevCaps((UIntPtr)deviceId, out caps);
+                result[deviceId] = new InputDevice((UIntPtr)deviceId, caps);
             }
             return result;
         }
@@ -99,11 +88,10 @@ namespace Midi.Devices
         {
             var outDevs = Win32API.midiOutGetNumDevs();
             var result = new IOutputDevice[outDevs];
-            for (uint deviceId = 0; deviceId < outDevs; deviceId++)
-            {
+            for (uint deviceId = 0; deviceId < outDevs; deviceId++) {
                 MidiOutCaps caps;
-                Win32API.midiOutGetDevCaps((UIntPtr) deviceId, out caps);
-                result[deviceId] = new OutputDevice((UIntPtr) deviceId, caps);
+                Win32API.midiOutGetDevCaps((UIntPtr)deviceId, out caps);
+                result[deviceId] = new OutputDevice((UIntPtr)deviceId, caps);
             }
             return result;
         }

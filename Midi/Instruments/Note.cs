@@ -79,18 +79,15 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentException">name cannot be parsed.</exception>
         public Note(string name)
         {
-            if (name == null)
-            {
+            if (name == null) {
                 throw new ArgumentNullException(nameof(name));
             }
-            if (name.Length == 0)
-            {
+            if (name.Length == 0) {
                 throw new ArgumentException("name is empty.");
             }
             var pos = 0;
             this = ParseNote(name, ref pos);
-            if (name.Length > pos)
-            {
+            if (name.Length > pos) {
                 throw new ArgumentException($"unexpected character '{name[pos]}'.");
             }
         }
@@ -109,8 +106,7 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentOutOfRangeException">letter is out of range.</exception>
         public Note(char letter, int accidental)
         {
-            if (letter < 'A' || letter > 'G')
-            {
+            if (letter < 'A' || letter > 'G') {
                 throw new ArgumentOutOfRangeException(nameof(letter));
             }
             Letter = letter;
@@ -145,12 +141,10 @@ namespace Midi.Instruments
         /// </returns>
         public override string ToString()
         {
-            if (Accidental > 0)
-            {
+            if (Accidental > 0) {
                 return new string(Letter, 1) + new string('#', Accidental);
             }
-            if (Accidental < 0)
-            {
+            if (Accidental < 0) {
                 return new string(Letter, 1) + new string('b', -Accidental);
             }
             return new string(Letter, 1);
@@ -176,26 +170,20 @@ namespace Midi.Instruments
         public static Note ParseNote(string s, ref int pos)
         {
             var p = pos;
-            if (s[p] < 'A' || s[p] > 'G')
-            {
+            if (s[p] < 'A' || s[p] > 'G') {
                 throw new ArgumentException($"invalid note letter: '{s[p]}'");
             }
             var letter = s[p];
             p++;
             // Parse the accidental.
             var accidental = 0;
-            if (s.Length > p && s[p] == '#')
-            {
-                while (p < s.Length && s[p] == '#')
-                {
+            if (s.Length > p && s[p] == '#') {
+                while (p < s.Length && s[p] == '#') {
                     accidental++;
                     p++;
                 }
-            }
-            else if (s.Length > p && s[p] == 'b')
-            {
-                while (p < s.Length && s[p] == 'b')
-                {
+            } else if (s.Length > p && s[p] == 'b') {
+                while (p < s.Length && s[p] == 'b') {
                     accidental--;
                     p++;
                 }
@@ -224,7 +212,7 @@ namespace Midi.Instruments
         /// <returns>The pitch with this name in the specified octave.</returns>
         public Pitch PitchInOctave(int octave)
         {
-            return (Pitch) (PositionInOctave + 12*(octave + 1));
+            return (Pitch)(PositionInOctave + 12 * (octave + 1));
         }
 
         /// <summary>
@@ -235,8 +223,7 @@ namespace Midi.Instruments
         public Pitch PitchAtOrAbove(Pitch nearPitch)
         {
             var semitoneDelta = PositionInOctave - nearPitch.PositionInOctave();
-            if (semitoneDelta < 0)
-            {
+            if (semitoneDelta < 0) {
                 semitoneDelta += 12;
             }
             return nearPitch + semitoneDelta;
@@ -250,8 +237,7 @@ namespace Midi.Instruments
         public Pitch PitchAtOrBelow(Pitch nearPitch)
         {
             var semitoneDelta = PositionInOctave - nearPitch.PositionInOctave();
-            if (semitoneDelta > 0)
-            {
+            if (semitoneDelta > 0) {
                 semitoneDelta -= 12;
             }
             return nearPitch + semitoneDelta;
@@ -265,8 +251,7 @@ namespace Midi.Instruments
         public int SemitonesUpTo(Note otherNote)
         {
             var semitoneDelta = otherNote.PositionInOctave - PositionInOctave;
-            if (semitoneDelta < 0)
-            {
+            if (semitoneDelta < 0) {
                 semitoneDelta += 12;
             }
             return semitoneDelta;
@@ -280,8 +265,7 @@ namespace Midi.Instruments
         public int SemitonesDownTo(Note otherNote)
         {
             var semitoneDelta = PositionInOctave - otherNote.PositionInOctave;
-            if (semitoneDelta < 0)
-            {
+            if (semitoneDelta < 0) {
                 semitoneDelta += 12;
             }
             return semitoneDelta;
@@ -304,11 +288,10 @@ namespace Midi.Instruments
         /// </summary>
         public override bool Equals(object obj)
         {
-            if (!(obj is Note))
-            {
+            if (!(obj is Note)) {
                 return false;
             }
-            var other = (Note) obj;
+            var other = (Note)obj;
             return Letter == other.Letter && Accidental == other.Accidental;
         }
 

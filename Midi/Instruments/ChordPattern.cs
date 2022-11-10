@@ -38,13 +38,11 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentNullException">an argument is null.</exception>
         public ChordPattern(string name, string abbreviation, int[] ascent, int[] letterOffsets)
         {
-            if (name == null || abbreviation == null || ascent == null || letterOffsets == null)
-            {
+            if (name == null || abbreviation == null || ascent == null || letterOffsets == null) {
                 throw new ArgumentNullException();
             }
             if (ascent.Length != letterOffsets.Length || !IsSequenceValid(ascent) ||
-                !IsSequenceValid(letterOffsets))
-            {
+                !IsSequenceValid(letterOffsets)) {
                 throw new ArgumentException();
             }
             Name = string.Copy(name);
@@ -108,7 +106,7 @@ namespace Midi.Instruments
         /// </summary>
         public static bool operator ==(ChordPattern a, ChordPattern b)
         {
-            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object) b);
+            return ReferenceEquals(a, null) ? ReferenceEquals(b, null) : a.Equals((object)b);
         }
 
         /// <summary>
@@ -127,7 +125,7 @@ namespace Midi.Instruments
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((ChordPattern) obj);
+            return Equals((ChordPattern)obj);
         }
 
         /// <summary>
@@ -135,12 +133,11 @@ namespace Midi.Instruments
         /// </summary>
         public override int GetHashCode()
         {
-            unchecked
-            {
+            unchecked {
                 var hashCode = Name?.GetHashCode() ?? 0;
-                hashCode = (hashCode*397) ^ (Abbreviation?.GetHashCode() ?? 0);
-                hashCode = (hashCode*397) ^ (Ascent?.GetHashCode() ?? 0);
-                hashCode = (hashCode*397) ^ (LetterOffsets?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Abbreviation?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Ascent?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (LetterOffsets?.GetHashCode() ?? 0);
                 return hashCode;
             }
         }
@@ -160,15 +157,12 @@ namespace Midi.Instruments
         private bool IsSequenceValid(int[] sequence)
         {
             // Make sure it is non-empty and starts at zero.
-            if (sequence.Length < 2 || sequence[0] != 0)
-            {
+            if (sequence.Length < 2 || sequence[0] != 0) {
                 return false;
             }
             // Make sure it's monotonically increasing.
-            for (var i = 1; i < sequence.Length; ++i)
-            {
-                if (sequence[i] <= sequence[i - 1])
-                {
+            for (var i = 1; i < sequence.Length; ++i) {
+                if (sequence[i] <= sequence[i - 1]) {
                     return false;
                 }
             }

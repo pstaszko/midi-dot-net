@@ -126,9 +126,8 @@ namespace Midi.Enums
         /// </returns>
         public static string Name(this Interval interval)
         {
-            var value = Math.Abs((int) interval);
-            if (value >= 0 && value <= 12)
-            {
+            var value = Math.Abs((int)interval);
+            if (value >= 0 && value <= 12) {
                 return IntervalNames[value];
             }
             return $"{value} semitones";

@@ -143,7 +143,7 @@ namespace Midi.Enums
         /// <param name="control">The Control to test.</param>
         public static bool IsValid(this Control control)
         {
-            return (int) control >= 0 && (int) control < 128;
+            return (int)control >= 0 && (int)control < 128;
         }
 
         /// <summary>
@@ -153,8 +153,7 @@ namespace Midi.Enums
         /// <exception cref="ArgumentOutOfRangeException">The control is out-of-range.</exception>
         public static void Validate(this Control control)
         {
-            if (!control.IsValid())
-            {
+            if (!control.IsValid()) {
                 throw new ArgumentOutOfRangeException(nameof(control));
             }
         }
@@ -167,9 +166,8 @@ namespace Midi.Enums
         public static string Name(this Control control)
         {
             control.Validate();
-            if (ControlNames.ContainsKey((int) control))
-            {
-                return ControlNames[(int) control];
+            if (ControlNames.ContainsKey((int)control)) {
+                return ControlNames[(int)control];
             }
             return "Other Control (see MIDI spec for details).";
         }

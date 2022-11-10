@@ -16,7 +16,7 @@ namespace Midi.Common
         {
             //http://stackoverflow.com/questions/3762113/how-can-an-uintptr-object-be-converted-to-intptr-in-c
 
-            return unchecked((IntPtr) (long) (ulong) ptr);
+            return unchecked((IntPtr)(long)(ulong)ptr);
         }
 
         /// <summary>

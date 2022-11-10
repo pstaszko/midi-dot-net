@@ -19,8 +19,7 @@ namespace Midi.Messages
         public PitchBendMessage(IDeviceBase device, Channel channel, int value, float time)
             : base(device, channel, time)
         {
-            if (value < 0 || value > 16383)
-            {
+            if (value < 0 || value > 16383) {
                 throw new ArgumentOutOfRangeException(nameof(value));
             }
             Value = value;

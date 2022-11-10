@@ -26,8 +26,7 @@ namespace Midi.Messages
             : base(device, time)
         {
             percussion.Validate();
-            if (velocity < 0 || velocity > 127)
-            {
+            if (velocity < 0 || velocity > 127) {
                 throw new ArgumentOutOfRangeException(nameof(velocity));
             }
             Percussion = percussion;
@@ -49,7 +48,7 @@ namespace Midi.Messages
         /// </summary>
         public override void SendNow()
         {
-            (Device as IOutputDevice)?.SendNoteOn(Channel.Channel10, (Pitch) Percussion, Velocity);
+            (Device as IOutputDevice)?.SendNoteOn(Channel.Channel10, (Pitch)Percussion, Velocity);
         }
 
         /// <summary>

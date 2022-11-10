@@ -48,40 +48,40 @@ namespace Midi.Instruments
         ///     Pattern for Major scales.
         /// </summary>
         public static ScalePattern Major =
-            new ScalePattern("Major", new[] {0, 2, 4, 5, 7, 9, 11});
+            new ScalePattern("Major", new[] { 0, 2, 4, 5, 7, 9, 11 });
 
         /// <summary>
         ///     Pattern for Natural Minor scales.
         /// </summary>
         public static ScalePattern NaturalMinor =
-            new ScalePattern("Natural Minor", new[] {0, 2, 3, 5, 7, 8, 10});
+            new ScalePattern("Natural Minor", new[] { 0, 2, 3, 5, 7, 8, 10 });
 
         /// <summary>
         ///     Pattern for Harmonic Minor scales.
         /// </summary>
         public static ScalePattern HarmonicMinor =
-            new ScalePattern("Harmonic Minor", new[] {0, 2, 3, 5, 7, 8, 11});
+            new ScalePattern("Harmonic Minor", new[] { 0, 2, 3, 5, 7, 8, 11 });
 
         /// <summary>
         ///     Pattern for Melodic Minor scale as it ascends.
         /// </summary>
         public static ScalePattern MelodicMinorAscending =
             new ScalePattern("Melodic Minor (ascending)",
-                new[] {0, 2, 3, 5, 7, 9, 11});
+                new[] { 0, 2, 3, 5, 7, 9, 11 });
 
         /// <summary>
         ///     Pattern for Melodic Minor scale as it descends.
         /// </summary>
         public static ScalePattern MelodicMinorDescending =
             new ScalePattern("Melodic Minor (descending)",
-                new[] {0, 2, 3, 5, 7, 8, 10});
+                new[] { 0, 2, 3, 5, 7, 8, 10 });
 
         /// <summary>
         ///     Pattern for Chromatic scales.
         /// </summary>
         public static ScalePattern Chromatic =
             new ScalePattern("Chromatic",
-                new[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11});
+                new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 });
 
         /// <summary>
         ///     Array of all the built-in scale patterns.
@@ -106,8 +106,7 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentNullException">tonic or pattern is null.</exception>
         public Scale(Note tonic, ScalePattern pattern)
         {
-            if (tonic == null || pattern == null)
-            {
+            if (tonic == null || pattern == null) {
                 throw new ArgumentNullException();
             }
             Tonic = tonic;
@@ -197,8 +196,7 @@ namespace Midi.Instruments
         public override bool Equals(object obj)
         {
             var other = obj as Scale;
-            if ((object) other == null)
-            {
+            if ((object)other == null) {
                 return false;
             }
 
@@ -234,26 +232,20 @@ namespace Midi.Instruments
             int[] positionInOctaveToSequenceIndex, Note[] noteSequence, out int numAccidentals)
         {
             numAccidentals = 0;
-            for (var i = 0; i < 12; ++i)
-            {
+            for (var i = 0; i < 12; ++i) {
                 positionInOctaveToSequenceIndex[i] = -1;
             }
             var tonicPitch = tonic.PitchInOctave(0);
-            for (var i = 0; i < pattern.Ascent.Length; ++i)
-            {
+            for (var i = 0; i < pattern.Ascent.Length; ++i) {
                 var pitch = tonicPitch + pattern.Ascent[i];
                 Note note;
-                if (pattern.Ascent.Length == 7)
-                {
-                    var letter = (char) (i + tonic.Letter);
-                    if (letter > 'G')
-                    {
-                        letter = (char) (letter - 7);
+                if (pattern.Ascent.Length == 7) {
+                    var letter = (char)(i + tonic.Letter);
+                    if (letter > 'G') {
+                        letter = (char)(letter - 7);
                     }
                     note = pitch.NoteWithLetter(letter);
-                }
-                else
-                {
+                } else {
                     note = pitch.NotePreferringSharps();
                 }
                 noteSequence[i] = note;

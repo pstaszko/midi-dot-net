@@ -85,7 +85,7 @@ namespace Midi.Win32
         public static MMRESULT midiOutGetDevCaps(UIntPtr uDeviceId, out MidiOutCaps caps)
         {
             return midiOutGetDevCaps(uDeviceId, out caps,
-                (uint) Marshal.SizeOf(typeof (MidiOutCaps)));
+                (uint)Marshal.SizeOf(typeof(MidiOutCaps)));
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Midi.Win32
         /// Win32 docs: http://msdn.microsoft.com/en-us/library/ms711622(VS.85).aspx
         public static MMRESULT midiOutGetErrorText(MMRESULT mmrError, StringBuilder lpText)
         {
-            return midiOutGetErrorText(mmrError, lpText, (uint) lpText.Capacity);
+            return midiOutGetErrorText(mmrError, lpText, (uint)lpText.Capacity);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Midi.Win32
         public static MMRESULT midiInGetDevCaps(UIntPtr uDeviceId, out MIDIINCAPS caps)
         {
             return midiInGetDevCaps(uDeviceId, out caps,
-                (uint) Marshal.SizeOf(typeof (MIDIINCAPS)));
+                (uint)Marshal.SizeOf(typeof(MIDIINCAPS)));
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Midi.Win32
         /// Win32 docs: http://msdn.microsoft.com/en-us/library/ms711605(VS.85).aspx
         public static MMRESULT midiInGetErrorText(MMRESULT mmrError, StringBuilder lpText)
         {
-            return midiInGetErrorText(mmrError, lpText, (uint) lpText.Capacity);
+            return midiInGetErrorText(mmrError, lpText, (uint)lpText.Capacity);
         }
 
         /// <summary>

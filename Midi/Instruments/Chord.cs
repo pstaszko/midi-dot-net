@@ -50,31 +50,31 @@ namespace Midi.Instruments
         ///     Pattern for Major chords.
         /// </summary>
         public static readonly ChordPattern Major =
-            new ChordPattern("Major", "", new[] {0, 4, 7}, new[] {0, 2, 4});
+            new ChordPattern("Major", "", new[] { 0, 4, 7 }, new[] { 0, 2, 4 });
 
         /// <summary>
         ///     Pattern for Minor chords.
         /// </summary>
         public static readonly ChordPattern Minor =
-            new ChordPattern("Minor", "m", new[] {0, 3, 7}, new[] {0, 2, 4});
+            new ChordPattern("Minor", "m", new[] { 0, 3, 7 }, new[] { 0, 2, 4 });
 
         /// <summary>
         ///     Pattern for Seventh chords.
         /// </summary>
         public static readonly ChordPattern Seventh =
-            new ChordPattern("Seventh", "7", new[] {0, 4, 7, 10}, new[] {0, 2, 4, 6});
+            new ChordPattern("Seventh", "7", new[] { 0, 4, 7, 10 }, new[] { 0, 2, 4, 6 });
 
         /// <summary>
         ///     Pattern for Augmented chords.
         /// </summary>
         public static readonly ChordPattern Augmented =
-            new ChordPattern("Augmented", "aug", new[] {0, 4, 8}, new[] {0, 2, 4});
+            new ChordPattern("Augmented", "aug", new[] { 0, 4, 8 }, new[] { 0, 2, 4 });
 
         /// <summary>
         ///     Pattern for Diminished chords.
         /// </summary>
         public static readonly ChordPattern Diminished =
-            new ChordPattern("Diminished", "dim", new[] {0, 3, 6}, new[] {0, 2, 4});
+            new ChordPattern("Diminished", "dim", new[] { 0, 3, 6 }, new[] { 0, 2, 4 });
 
         /// <summary>
         ///     Array of all the built-in chord patterns.
@@ -104,12 +104,10 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentOutOfRangeException">inversion is out of range.</exception>
         public Chord(Note root, ChordPattern pattern, int inversion)
         {
-            if (pattern == null)
-            {
+            if (pattern == null) {
                 throw new ArgumentNullException();
             }
-            if (inversion < 0 || inversion >= pattern.Ascent.Length)
-            {
+            if (inversion < 0 || inversion >= pattern.Ascent.Length) {
                 throw new ArgumentOutOfRangeException(nameof(inversion));
             }
             Root = root;
@@ -136,37 +134,30 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentException">cannot parse a chord from name.</exception>
         public Chord(string name)
         {
-            if (name == null)
-            {
+            if (name == null) {
                 throw new ArgumentNullException(nameof(name));
             }
-            if (name.Length == 0)
-            {
+            if (name.Length == 0) {
                 throw new ArgumentException("name is empty.");
             }
             var pos = 0;
             Root = Note.ParseNote(name, ref pos);
             Pattern = null;
-            foreach (var p in Patterns)
-            {
-                if (pos + p.Abbreviation.Length > name.Length)
-                {
+            foreach (var p in Patterns) {
+                if (pos + p.Abbreviation.Length > name.Length) {
                     continue;
                 }
-                if (string.Compare(name, pos, p.Abbreviation, 0, p.Abbreviation.Length) != 0)
-                {
+                if (string.Compare(name, pos, p.Abbreviation, 0, p.Abbreviation.Length) != 0) {
                     continue;
                 }
                 if (pos + p.Abbreviation.Length == name.Length ||
-                    name[pos + p.Abbreviation.Length] == '/')
-                {
+                    name[pos + p.Abbreviation.Length] == '/') {
                     pos += p.Abbreviation.Length;
                     Pattern = p;
                     break;
                 }
             }
-            if (Pattern == null)
-            {
+            if (Pattern == null) {
                 throw new ArgumentException("name does not match a known chord pattern.");
             }
             // At this point, we know the note and pattern (but not yet the inversion).  Build
@@ -178,21 +169,17 @@ namespace Midi.Instruments
             NoteSequence = new Note[Pattern.Ascent.Length];
             // Now see if there's an inversion.
             Inversion = 0;
-            if (pos < name.Length)
-            {
-                if (name[pos] != '/')
-                {
+            if (pos < name.Length) {
+                if (name[pos] != '/') {
                     throw new ArgumentException($"unexpected character '{name[pos]}' in name.");
                 }
                 pos++;
                 var bass = Note.ParseNote(name, ref pos);
-                if (name.Length > pos)
-                {
+                if (name.Length > pos) {
                     throw new ArgumentException($"unexpected character '{name[pos]}' in name.");
                 }
                 Inversion = Array.IndexOf(uninvertedSequence, bass);
-                if (Inversion == -1)
-                {
+                if (Inversion == -1) {
                     throw new ArgumentException("invalid bass note for inversion.");
                 }
             }
@@ -204,10 +191,8 @@ namespace Midi.Instruments
         /// </summary>
         public string Name
         {
-            get
-            {
-                if (Inversion == 0)
-                {
+            get {
+                if (Inversion == 0) {
                     return $"{Root}{Pattern.Abbreviation}";
                 }
                 return $"{Root}{Pattern.Abbreviation}/{NoteSequence[0]}";
@@ -241,52 +226,41 @@ namespace Midi.Instruments
             var sorted = pitches.ToArray();
             Array.Sort(sorted);
             var semitonesAboveBass = new int[sorted.Length];
-            for (var i = 0; i < sorted.Length; ++i)
-            {
+            for (var i = 0; i < sorted.Length; ++i) {
                 semitonesAboveBass[i] = sorted[i] - sorted[0];
             }
 
             var result = new List<Chord>();
-            foreach (var pattern in Patterns)
-            {
+            foreach (var pattern in Patterns) {
                 var semitoneSequence = pattern.Ascent;
-                if (semitoneSequence.Length != semitonesAboveBass.Length)
-                {
+                if (semitoneSequence.Length != semitonesAboveBass.Length) {
                     continue;
                 }
-                for (var inversion = 0; inversion < semitoneSequence.Length; ++inversion)
-                {
+                for (var inversion = 0; inversion < semitoneSequence.Length; ++inversion) {
                     var invertedSequence = new int[semitoneSequence.Length];
                     RotateArrayLeft(semitoneSequence, invertedSequence, inversion);
-                    if (inversion != 0)
-                    {
-                        for (var i = 0; i < semitoneSequence.Length - inversion; ++i)
-                        {
+                    if (inversion != 0) {
+                        for (var i = 0; i < semitoneSequence.Length - inversion; ++i) {
                             invertedSequence[i] -= 12;
                         }
                     }
                     var iSemitonesAboveBass = new int[invertedSequence.Length];
-                    for (var i = 0; i < invertedSequence.Length; ++i)
-                    {
+                    for (var i = 0; i < invertedSequence.Length; ++i) {
                         iSemitonesAboveBass[i] = invertedSequence[i] - invertedSequence[0];
                     }
                     var equals = true;
-                    for (var i = 0; i < iSemitonesAboveBass.Length; ++i)
-                    {
-                        if (iSemitonesAboveBass[i] != semitonesAboveBass[i])
-                        {
+                    for (var i = 0; i < iSemitonesAboveBass.Length; ++i) {
+                        if (iSemitonesAboveBass[i] != semitonesAboveBass[i]) {
                             equals = false;
                             break;
                         }
                     }
-                    if (equals)
-                    {
+                    if (equals) {
                         var rootPitch =
                             inversion == 0 ? sorted[0] : sorted[sorted.Length - inversion];
                         var rootNote = rootPitch.NotePreferringSharps();
                         result.Add(new Chord(rootNote, pattern, inversion));
-                        if (rootPitch.NotePreferringFlats() != rootNote)
-                        {
+                        if (rootPitch.NotePreferringFlats() != rootNote) {
                             var otherRootNote = rootPitch.NotePreferringFlats();
                             result.Add(new Chord(otherRootNote, pattern, inversion));
                         }
@@ -337,8 +311,7 @@ namespace Midi.Instruments
         public override bool Equals(object obj)
         {
             var c = obj as Chord;
-            if ((object) c == null)
-            {
+            if ((object)c == null) {
                 return false;
             }
 
@@ -358,18 +331,15 @@ namespace Midi.Instruments
         private static void Build(Note root, ChordPattern pattern,
             bool[] positionInOctaveToContains, Note[] noteSequence)
         {
-            for (var i = 0; i < 12; ++i)
-            {
+            for (var i = 0; i < 12; ++i) {
                 positionInOctaveToContains[i] = false;
             }
             var rootPitch = root.PitchInOctave(0);
-            for (var i = 0; i < pattern.Ascent.Length; ++i)
-            {
+            for (var i = 0; i < pattern.Ascent.Length; ++i) {
                 var pitch = rootPitch + pattern.Ascent[i];
-                var letter = (char) (pattern.LetterOffsets[i] + root.Letter);
-                while (letter > 'G')
-                {
-                    letter = (char) (letter - 7);
+                var letter = (char)(pattern.LetterOffsets[i] + root.Letter);
+                while (letter > 'G') {
+                    letter = (char)(letter - 7);
                 }
                 noteSequence[i] = pitch.NoteWithLetter(letter);
                 positionInOctaveToContains[pitch.PositionInOctave()] = true;
@@ -387,19 +357,14 @@ namespace Midi.Instruments
         /// <param name="rotation">The number of elements to rotate to the left by.</param>
         private static void RotateArrayLeft(Array source, Array dest, int rotation)
         {
-            if (source.Length != dest.Length)
-            {
+            if (source.Length != dest.Length) {
                 throw new ArgumentException("source and dest lengths differ.");
             }
-            if (rotation == 0)
-            {
+            if (rotation == 0) {
                 source.CopyTo(dest, 0);
-            }
-            else
-            {
-                for (var i = 0; i < source.Length; ++i)
-                {
-                    dest.SetValue(source.GetValue((rotation + i)%source.Length), i);
+            } else {
+                for (var i = 0; i < source.Length; ++i) {
+                    dest.SetValue(source.GetValue((rotation + i) % source.Length), i);
                 }
             }
         }

@@ -14,7 +14,7 @@ namespace Midi.Win32
         public ushort wMid;
         public ushort wPid;
         public uint vDriverVersion;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int) Win32API.MaxPNameLen)] public string szPname;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = (int)Win32API.MaxPNameLen)] public string szPname;
         public uint dwSupport;
     }
 }

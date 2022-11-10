@@ -22,8 +22,7 @@ namespace Midi.Messages
             : base(device, channel, time)
         {
             control.Validate();
-            if (value < 0 || value > 127)
-            {
+            if (value < 0 || value > 127) {
                 throw new ArgumentOutOfRangeException(nameof(control));
             }
             Control = control;
