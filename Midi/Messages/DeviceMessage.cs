@@ -1,5 +1,5 @@
-using System;
 using Midi.Devices;
+using System;
 
 namespace Midi.Messages
 {

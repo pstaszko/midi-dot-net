@@ -1,9 +1,9 @@
 // Copyright (c) 2011, Justin Ryan
 
-using System;
-using System.Runtime.InteropServices;
 using Midi.Common;
 using Midi.Win32;
+using System;
+using System.Runtime.InteropServices;
 
 namespace Midi.Devices
 {

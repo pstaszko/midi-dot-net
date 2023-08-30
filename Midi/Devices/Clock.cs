@@ -22,11 +22,11 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+using Midi.Messages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using Midi.Messages;
 
 namespace Midi.Devices
 {

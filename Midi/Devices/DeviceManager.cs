@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Midi.Win32;
+using System;
 using System.Collections.ObjectModel;
-using Midi.Win32;
 
 namespace Midi.Devices
 {

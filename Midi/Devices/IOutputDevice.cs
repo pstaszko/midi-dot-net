@@ -1,6 +1,6 @@
-using System;
 using Midi.Enums;
 using Midi.Messages;
+using System;
 
 namespace Midi.Devices
 {
