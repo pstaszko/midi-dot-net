@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Op: Project MidiCurrent Library net6.0-windows -->
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <OptionCompare>Text</OptionCompare>
+    <OutputType>Library</OutputType>
+    <WarningsAsErrors>0025;3239;FS0001;FS0020;FS0025;FS0026;FS0193;FS0049</WarningsAsErrors>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsPackable>false</IsPackable>
+    <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Debug_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Release_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <PreBuildEvent>del C:\DEV\temp\HP\C__Dev_Releases_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <OutputPath>bin\Release\</OutputPath>
+  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <FSharpCoreResourcesFiles Include="$(OutputPath)**\Terminal.Gui.resources.dll" />
+      <FSharpCoreResourcesFiles Include="$(OutputPath)**\FSharp.Core.resources.dll" />
+      <FSharpCoreResourcesDirs Include="@(FSharpCoreResourcesFiles-&gt;'\%(Directory)') " />
+    </ItemGroup>
+    <RemoveDir Directories="@(FSharpCoreResourcesDirs)" />
+  </Target>
+  <!-- Op: End -->
+  <ItemGroup>
+    <None Include=".refs" />
+    <None Include="paket.references" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Midi\Common\Int14.cs" Link="Common\Int14.cs" />
+    <Compile Include="..\Midi\Common\Unmanaged.cs" Link="Common\Unmanaged.cs" />
+    <Compile Include="..\Midi\Devices\Clock.cs" Link="Devices\Clock.cs" />
+    <Compile Include="..\Midi\Devices\DeviceBase.cs" Link="Devices\DeviceBase.cs" />
+    <Compile Include="..\Midi\Devices\DeviceException.cs" Link="Devices\DeviceException.cs" />
+    <Compile Include="..\Midi\Devices\DeviceManager.cs" Link="Devices\DeviceManager.cs" />
+    <Compile Include="..\Midi\Devices\IInputDevice.cs" Link="Devices\IInputDevice.cs" />
+    <Compile Include="..\Midi\Devices\InputDevice.cs" Link="Devices\InputDevice.cs" />
+    <Compile Include="..\Midi\Devices\IOutputDevice.cs" Link="Devices\IOutputDevice.cs" />
+    <Compile Include="..\Midi\Devices\LongMsg.cs" Link="Devices\LongMsg.cs" />
+    <Compile Include="..\Midi\Devices\MessageQueue.cs" Link="Devices\MessageQueue.cs" />
+    <Compile Include="..\Midi\Devices\OutputDevice.cs" Link="Devices\OutputDevice.cs" />
+    <Compile Include="..\Midi\Devices\ShortMsg.cs" Link="Devices\ShortMsg.cs" />
+    <Compile Include="..\Midi\Enums\Channel.cs" Link="Enums\Channel.cs" />
+    <Compile Include="..\Midi\Enums\Control.cs" Link="Enums\Control.cs" />
+    <Compile Include="..\Midi\Enums\Instrument.cs" Link="Enums\Instrument.cs" />
+    <Compile Include="..\Midi\Enums\Interval.cs" Link="Enums\Interval.cs" />
+    <Compile Include="..\Midi\Enums\Percussion.cs" Link="Enums\Percussion.cs" />
+    <Compile Include="..\Midi\Enums\Pitch.cs" Link="Enums\Pitch.cs" />
+    <Compile Include="..\Midi\Instruments\Chord.cs" Link="Instruments\Chord.cs" />
+    <Compile Include="..\Midi\Instruments\ChordPattern.cs" Link="Instruments\ChordPattern.cs" />
+    <Compile Include="..\Midi\Instruments\Note.cs" Link="Instruments\Note.cs" />
+    <Compile Include="..\Midi\Instruments\Scale.cs" Link="Instruments\Scale.cs" />
+    <Compile Include="..\Midi\Instruments\ScalePattern.cs" Link="Instruments\ScalePattern.cs" />
+    <Compile Include="..\Midi\Messages\CallbackMessage.cs" Link="Messages\CallbackMessage.cs" />
+    <Compile Include="..\Midi\Messages\ChannelMessage.cs" Link="Messages\ChannelMessage.cs" />
+    <Compile Include="..\Midi\Messages\ControlChangeMessage.cs" Link="Messages\ControlChangeMessage.cs" />
+    <Compile Include="..\Midi\Messages\DeviceMessage.cs" Link="Messages\DeviceMessage.cs" />
+    <Compile Include="..\Midi\Messages\Message.cs" Link="Messages\Message.cs" />
+    <Compile Include="..\Midi\Messages\NoteMessage.cs" Link="Messages\NoteMessage.cs" />
+    <Compile Include="..\Midi\Messages\NoteOffMessage.cs" Link="Messages\NoteOffMessage.cs" />
+    <Compile Include="..\Midi\Messages\NoteOnMessage.cs" Link="Messages\NoteOnMessage.cs" />
+    <Compile Include="..\Midi\Messages\NoteOnOffMessage.cs" Link="Messages\NoteOnOffMessage.cs" />
+    <Compile Include="..\Midi\Messages\NrpnMessage.cs" Link="Messages\NrpnMessage.cs" />
+    <Compile Include="..\Midi\Messages\PercussionMessage.cs" Link="Messages\PercussionMessage.cs" />
+    <Compile Include="..\Midi\Messages\PitchBendMessage.cs" Link="Messages\PitchBendMessage.cs" />
+    <Compile Include="..\Midi\Messages\ProgramChangeMessage.cs" Link="Messages\ProgramChangeMessage.cs" />
+    <Compile Include="..\Midi\Messages\SysExMessage.cs" Link="Messages\SysExMessage.cs" />
+    <Compile Include="..\Midi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Midi\Win32\HMIDIIN.cs" Link="Win32\HMIDIIN.cs" />
+    <Compile Include="..\Midi\Win32\HMIDIOUT.cs" Link="Win32\HMIDIOUT.cs" />
+    <Compile Include="..\Midi\Win32\MidiDeviceType.cs" Link="Win32\MidiDeviceType.cs" />
+    <Compile Include="..\Midi\Win32\MidiExtraFeatures.cs" Link="Win32\MidiExtraFeatures.cs" />
+    <Compile Include="..\Midi\Win32\MIDIHDR.cs" Link="Win32\MIDIHDR.cs" />
+    <Compile Include="..\Midi\Win32\MIDIINCAPS.cs" Link="Win32\MIDIINCAPS.cs" />
+    <Compile Include="..\Midi\Win32\MidiInMessage.cs" Link="Win32\MidiInMessage.cs" />
+    <Compile Include="..\Midi\Win32\MidiOpenFlags.cs" Link="Win32\MidiOpenFlags.cs" />
+    <Compile Include="..\Midi\Win32\MidiOutCaps.cs" Link="Win32\MidiOutCaps.cs" />
+    <Compile Include="..\Midi\Win32\MidiOutMessage.cs" Link="Win32\MidiOutMessage.cs" />
+    <Compile Include="..\Midi\Win32\MMRESULT.cs" Link="Win32\MMRESULT.cs" />
+    <Compile Include="..\Midi\Win32\Win32API.cs" Link="Win32\Win32API.cs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>
