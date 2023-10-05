@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsPackable>false</IsPackable>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
-    <AssemblyName>Midi</AssemblyName>
+    <RootNamespace>Midi</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PreBuildEvent>del C:\DEV\temp\HP\*bin_Debug_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
@@ -78,7 +78,6 @@
     <Compile Include="..\Midi\Messages\PitchBendMessage.cs" Link="Messages\PitchBendMessage.cs" />
     <Compile Include="..\Midi\Messages\ProgramChangeMessage.cs" Link="Messages\ProgramChangeMessage.cs" />
     <Compile Include="..\Midi\Messages\SysExMessage.cs" Link="Messages\SysExMessage.cs" />
-    <Compile Include="..\Midi\Properties\AssemblyInfo.cs" Link="Properties\AssemblyInfo.cs" />
     <Compile Include="..\Midi\Win32\HMIDIIN.cs" Link="Win32\HMIDIIN.cs" />
     <Compile Include="..\Midi\Win32\HMIDIOUT.cs" Link="Win32\HMIDIOUT.cs" />
     <Compile Include="..\Midi\Win32\MidiDeviceType.cs" Link="Win32\MidiDeviceType.cs" />
