@@ -45,8 +45,8 @@ namespace Midi.Instruments
                 !IsSequenceValid(letterOffsets)) {
                 throw new ArgumentException();
             }
-            Name = string.Copy(name);
-            Abbreviation = string.Copy(abbreviation);
+            Name = $"{name}";
+            Abbreviation = $"{abbreviation}";
             Ascent = new int[ascent.Length];
             Array.Copy(ascent, Ascent, ascent.Length);
             LetterOffsets = new int[letterOffsets.Length];

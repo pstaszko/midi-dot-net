@@ -106,7 +106,7 @@ namespace Midi.Instruments
         /// <exception cref="ArgumentNullException">tonic or pattern is null.</exception>
         public Scale(Note tonic, ScalePattern pattern)
         {
-            if (tonic == null || pattern == null) {
+            if (pattern == null) {
                 throw new ArgumentNullException();
             }
             Tonic = tonic;

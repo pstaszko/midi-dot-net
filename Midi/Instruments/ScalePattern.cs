@@ -32,7 +32,7 @@ namespace Midi.Instruments
             if (!AscentIsValid(ascent)) {
                 throw new ArgumentException("ascent is invalid.");
             }
-            Name = string.Copy(name);
+            Name = $"{name}";
             Ascent = new int[ascent.Length];
             Array.Copy(ascent, Ascent, ascent.Length);
         }
