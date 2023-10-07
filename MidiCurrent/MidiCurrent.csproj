@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Op: Project MidiCurrent Library net6.0-windows -->
-  <PropertyGroup>
+<PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
@@ -13,6 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsPackable>false</IsPackable>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
+    <AssemblyName>Midi</AssemblyName>
     <RootNamespace>Midi</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
