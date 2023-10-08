@@ -17,13 +17,13 @@
     <RootNamespace>Midi</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Debug_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Debug_Midi*_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>$(DefineConstants);MIDICURRENT;MIDI;NET6_0_WINDOWS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Release_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
-    <PreBuildEvent>del C:\DEV\temp\HP\C__Dev_Releases_MidiCurrent_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <PreBuildEvent>del C:\DEV\temp\HP\*bin_Release_Midi*_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
+    <PreBuildEvent>del C:\DEV\temp\HP\C__Dev_Releases_Midi*_* 1&gt;NUL 2&gt;NUL</PreBuildEvent>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>$(DefineConstants);MIDICURRENT;MIDI;NET6_0_WINDOWS</DefineConstants>
   </PropertyGroup>
