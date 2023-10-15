@@ -92,5 +92,5 @@
     <Compile Include="..\Midi\Win32\MMRESULT.cs" Link="Win32\MMRESULT.cs" />
     <Compile Include="..\Midi\Win32\Win32API.cs" Link="Win32\Win32API.cs" />
   </ItemGroup>
-  <Import Project="c:\dev\.paket\Paket.Restore.targets" />
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
